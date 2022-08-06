@@ -10,8 +10,8 @@ class TreeResource(Resource):
         password = os.getenv('password')
         #password = "Kp9gl8g7YWx9XDrqAW"
         app = Tree(uri, user, password)
-        app.create_friendship("Alice", "David")
-        app.find_person("Alice")
+        #app.create_friendship("Alice1", "David")
+        x=app.find_person("Alice")
         app.close()
 
 
