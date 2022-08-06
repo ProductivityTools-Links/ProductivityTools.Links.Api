@@ -17,6 +17,6 @@ class Account():
             "RETURN a"
         )
         result=tx.run(query,name=name)
-        
+
     def close(self):
         self.driver.close()
