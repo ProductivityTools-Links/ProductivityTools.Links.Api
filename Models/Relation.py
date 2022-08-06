@@ -3,14 +3,14 @@ from neo4j.exceptions import ServiceUnavailable
 import logging
 
 
-class Node():
+class Relation():
     def __init__(self,uri,user,password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
-    def create(self,parentId, name):
+    def create(self,parentId, childId):
         with self.driver.session(database="neo4j") as session:
             result=session.write_transaction(
-                self._create_node, 1, name
+                self._create_relation, parentId, childId
             )
 
             for row in result:
@@ -20,13 +20,13 @@ class Node():
         self.driver.close()
 
     @staticmethod
-    def _create_node(tx,id,name):
+    def _create_relation(tx,parentId,childId):
         query=(
-            "CREATE (n:Node{name:$name}) RETURN id(n) as id"
+            "match (m),(n) where id(m)=$parentId and id(n)=$childId Create (m)-[r:CHILD]->(n) return type(r) as type"
         )
-        result=tx.run(query,name=name)
+        result=tx.run(query,parentId=parentId,childId=childId)
         try:
-            return [row["id"] for row in result]
+            return [row["type"] for row in result]
             # Capture any errors along with the query and data for traceability
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(

@@ -1,6 +1,7 @@
 from flask_restful import Resource
 from flask import Response
-from Models.Exampple import Tree
+from Models.Node import Node
+from Models.Relation import Relation
 import os
 
 class TreeResource(Resource):
@@ -9,11 +10,12 @@ class TreeResource(Resource):
         user = "neo4j"
         password = os.getenv('password')
         #password = "Kp9gl8g7YWx9XDrqAW"
-        app = Tree(uri, user, password)
+        node = Node(uri, user, password)
         #app.create_friendship("Alice1", "David")
-        x=app.find_person("Alice")
-        app.close()
+        x=node.create(1, "Alice")
+        node.close()
 
+        relation=Relation(uri, user, password)
+        relation.create(1,x);
 
-
-        return Response("fdsa");
+        return Response(str(x), mimetype="text/plain", direct_passthrough=True);
