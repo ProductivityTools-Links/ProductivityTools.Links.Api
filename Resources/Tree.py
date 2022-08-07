@@ -27,6 +27,6 @@ class TreeResource(ApiResource):
         createdNodeId=node.create(nodeName);
         node.close();
         relation=Relation(self.uri,self.user,self.password);
-        relation.create(1,createdNodeId)
+        relation.create(37,createdNodeId)
         relation.close();
         return Response(str(createdNodeId), mimetype="text/plain", direct_passthrough=True);
