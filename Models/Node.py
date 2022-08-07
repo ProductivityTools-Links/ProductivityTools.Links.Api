@@ -7,10 +7,10 @@ class Node():
     def __init__(self,uri,user,password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
-    def create(self,parentId, name):
+    def create(self, name):
         with self.driver.session(database="neo4j") as session:
             result=session.write_transaction(
-                self._create_node, 1, name
+                self._create_node, name
             )
 
             for row in result:
@@ -20,7 +20,7 @@ class Node():
         self.driver.close()
 
     @staticmethod
-    def _create_node(tx,id,name):
+    def _create_node(tx,name):
         query=(
             "CREATE (n:Node{name:$name}) RETURN id(n) as id"
         )
