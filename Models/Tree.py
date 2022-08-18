@@ -1,6 +1,6 @@
 from neo4j import  GraphDatabase
 from DTO.Account import Account
-
+from DTO.Node import Node
 
 class Tree():
     def __init__(self, uri, user, password):
@@ -13,7 +13,8 @@ class Tree():
 
     @staticmethod
     def _get_tree(tx, login):
-        Tree._get_account(tx,login)
+        account=Tree._get_account(tx,login)
+
         query=(
             'MATCH(a:account{login:$login}) - [k:CHILD *]->(n:Node) return id(n) as idn, n, id(a) as ida, a, k'
         )
@@ -21,6 +22,8 @@ class Tree():
         #read the nodes what is done and start creating a tree
         result=tx.run(query,login=login)
         for element in result:
+            node=Node(element[0],element[2],element[1]._properties['name'])
+            account.add_node(node)
             print(element[0])
             print(element[1]._properties['name'])
             print('is a child of')
@@ -37,8 +40,7 @@ class Tree():
         tempresult=tx.run(query,login=login);
         result=tempresult.single()[0]
         account=Account(result.id,result._properties['login'])
-
-        print(id)
+        return account
 
 
     def close(self):
