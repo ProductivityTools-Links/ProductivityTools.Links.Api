@@ -6,4 +6,5 @@ class Node:
         self.nodes=[]
 
     def add_sub_node(self,node):
+        self.nodes.append(node)
         print(node.parent_id)
