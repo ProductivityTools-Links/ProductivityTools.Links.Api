@@ -10,7 +10,7 @@ class Account:
         else:
             Account.add_sub_node(self,node);
 
-    def add_sub_node(self,node,parent_Id):
+    def add_sub_node(self,node):
         for element in self.nodes:
-            element.add_sub_node(node,parent_Id);
+            element.add_sub_node(node);
 
