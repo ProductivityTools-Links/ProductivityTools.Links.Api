@@ -1,19 +1,19 @@
 from flask_restful import Resource
-from flask import Response, request
+from flask import Response, request, jsonify
 from Models.Node import Node
 from Models.Relation import Relation
 from Models.Tree import Tree
-import os
+import json
 from Resources.ApiResource import ApiResource
 
 class TreeResource(ApiResource):
     def get(self):
         tree = Tree(self.uri, self.user, self.password)
-        tree.getTree("pwujczyk1")
+        result=tree.getTree("pwujczyk1")
         tree.close()
-
-
-        return Response("ok", mimetype="text/plain", direct_passthrough=True);
+        jsonresult=json.dumps(result)
+        return jsonify(result)
+       #return Response("ok", mimetype="text/plain", direct_passthrough=True);
 
     def post(self):
         nodeName=request.json['name']
