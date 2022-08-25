@@ -15,7 +15,7 @@ class Tree():
         account=Tree._get_account(tx,login)
 
         query=(
-            'MATCH(a:account{login:$login}) - [k:CHILD *]->(n:Node) return id(n) as idn, n, id(a) as ida, a, k'
+                'MATCH(a:account{login:$login})-[k:CHILD *]->(n:Node) return id(n) as idn, n, id(a) as ida, a, k'
         )
         #read the account information
         #read the nodes what is done and start creating a tree
