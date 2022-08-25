@@ -20,11 +20,18 @@ class Tree():
         #read the account information
         #read the nodes what is done and start creating a tree
         result=tx.run(query,login=login)
+        lastNodeAdded=None
         for element in result:
             parent=Tree._find_parent(element)
             node=Node(element[0],parent,element[1]._properties['name'])
 
-            account.add_node(node)
+            if lastNodeAdded is not None and parent==lastNodeAdded.id:
+                lastNodeAdded.add_sub_node(node)
+                lastNodeAdded = node
+            else:
+                account.add_node(node)
+                lastNodeAdded = node
+
             print(element[0])
             print(element[1]._properties['name'])
             print('is a child of')
