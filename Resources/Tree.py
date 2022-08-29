@@ -28,4 +28,4 @@ class TreeResource(ApiResource):
         relation=Relation(self.uri,self.user,self.password);
         relation.create(parentId,createdNodeId)
         relation.close();
-        return Response(str(createdNodeId), mimetype="text/plain", direct_passthrough=True);
+

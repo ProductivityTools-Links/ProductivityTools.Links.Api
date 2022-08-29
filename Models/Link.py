@@ -22,7 +22,7 @@ class Link():
     @staticmethod
     def _create_link(tx, name,url,description):
         query = (
-        "CREATE (n:Link{name:$name,url:$url,$description}) RETURN id(n) as id"
+        "CREATE (n:Link{name:$name,url:$url,description:$description}) RETURN id(n) as id"
         )
         result = tx.run(query, name=name,url=url,description=description)
         try:

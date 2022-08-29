@@ -1,7 +1,7 @@
 from Resources.Date import DateResource
 from Resources.Tree import TreeResource
 from Resources.Account import AccountResource
-from Resources.Node import NodeResource
+from Resources.Link import LinkResource
 from flask import Flask
 import os
 from flask_restful import Api
@@ -18,7 +18,7 @@ def register_resources(app):
     api.add_resource(AccountResource,'/Account')
     api.add_resource(DateResource,'/Date')
     api.add_resource(TreeResource,'/Tree')
-    api.add_resource(NodeResource,'/Node')
+    api.add_resource(LinkResource,'/Link')
 
 
 if __name__=="__main__":
