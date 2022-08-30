@@ -2,10 +2,33 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 import logging
 
+from DTO.Link import Link
 
-class Link():
+
+
+class Links():
     def __init__(self,uri,user,password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
+
+    def getLinks(self):
+        with self.driver.session(database="neo4j") as session:
+            result = session.read_transaction(self._get_links)
+            return result;
+
+    @staticmethod
+    def _get_links(tx):
+        query = (
+            'match(l:Link) return l'
+        )
+        links=[]
+        result = tx.run(query)
+        for element in result:
+            link=Link(element[0], 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
+            links.append(link)
+        return links;
+
+    # return [{"id":row["k"][0].id,type:row["k"][0].type, "nodes":row["k"][0].nodes } for row in result]
+    # return [{"node":{"id": row["idn"] ,"name":row["n"]["name"]}, "account":{ "id": row["ida"] ,"name":row["a"]["login"]},"relation":{"r":row["k"]}} for row in result]
 
     def create(self, name,url,description):
         with self.driver.session(database="neo4j") as session:
