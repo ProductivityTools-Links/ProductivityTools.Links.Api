@@ -23,7 +23,7 @@ class Links():
         links=[]
         result = tx.run(query)
         for element in result:
-            link=Link(element[0], 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
+            link=Link(element[0].id, 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
             links.append(link)
         return links;
 

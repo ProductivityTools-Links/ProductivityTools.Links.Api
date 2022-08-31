@@ -22,7 +22,7 @@ class LinkResource(ApiResource):
         url=request.json['url']
         description=request.json['description']
 
-        link=Link(self.uri,self.user,self.password)
+        link=Links(self.uri,self.user,self.password)
         createdLinkId=link.create(name,url,description)
         link.close()
 
