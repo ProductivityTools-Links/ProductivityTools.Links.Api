@@ -20,7 +20,7 @@ def register_resources(app):
     api.add_resource(DateResource,'/Date')
     api.add_resource(TreeResource,'/Tree')
     api.add_resource(LinkResource,'/Link')
-    api.add_resource(Link2Resource, '/Link/<id>')
+    api.add_resource(Link2Resource, '/Link/<int:id>')
 
 
 if __name__=="__main__":
