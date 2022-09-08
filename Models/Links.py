@@ -10,18 +10,18 @@ class Links():
     def __init__(self,uri,user,password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
-    def getLinks(self):
+    def getLinks(self, id):
         with self.driver.session(database="neo4j") as session:
-            result = session.read_transaction(self._get_links)
+            result = session.read_transaction(self._get_links, id)
             return result;
 
     @staticmethod
-    def _get_links(tx):
+    def _get_links(tx,id):
         query = (
-            'match(l:Link) return l'
+            'match (n:Node)-[child*]->(l:Link) where ID(n)=$id return l'
         )
         links=[]
-        result = tx.run(query)
+        result = tx.run(query,id=id)
         for element in result:
             link=Link(element[0].id, 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
             links.append(link)

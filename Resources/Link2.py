@@ -7,7 +7,7 @@ import jsonpickle
 
 from Resources.ApiResource import ApiResource
 
-class LinkResource(ApiResource):
+class Link2Resource(ApiResource):
 
     def get(self,id):
         link = Links(self.uri, self.user, self.password)
