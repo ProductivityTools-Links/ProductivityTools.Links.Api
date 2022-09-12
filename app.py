@@ -19,8 +19,8 @@ def register_resources(app):
     api.add_resource(AccountResource,'/Account')
     api.add_resource(DateResource,'/Date')
     api.add_resource(TreeResource,'/Tree')
-    api.add_resource(LinkListResource,'/Link')
-    api.add_resource(LinkResource, '/Link/<int:id>')
+    api.add_resource(LinkResource,'/Link')
+    api.add_resource(LinkListResource, '/Link/<int:id>')
 
 
 if __name__=="__main__":

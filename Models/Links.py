@@ -18,7 +18,7 @@ class Links():
     @staticmethod
     def _get_links(tx,id):
         query = (
-            'match (n:Node)-[child*]->(l:Link) where ID(n)=$id return l'
+            'match (n)-[child*]->(l:Link) where ID(n)=$id return l'
         )
         links=[]
         result = tx.run(query,id=id)
