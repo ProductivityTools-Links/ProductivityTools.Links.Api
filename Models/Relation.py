@@ -32,3 +32,11 @@ class Relation():
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
             raise
+
+    @staticmethod
+    def _remove_parent_relation(tx,id):
+        query=(
+            "match (n)-[d:CHILD]->(l:Link) where ID(l)=$id  return d"
+        )
+        result=tx.run(query,id=id)
+        try

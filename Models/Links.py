@@ -15,6 +15,7 @@ class Links():
             result = session.read_transaction(self._get_links, id)
             return result;
 
+
     @staticmethod
     def _get_links(tx,id):
         query = (
