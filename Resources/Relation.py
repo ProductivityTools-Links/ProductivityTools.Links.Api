@@ -3,7 +3,7 @@ from http import HTTPStatus
 from Models.Relation import Relation
 from Resources.ApiResource import  ApiResource
 
-class Relation(ApiResource):
+class RelationResoure(ApiResource):
     def post(self, id, targetParentId):
         relation = Relation(self.uri, self.user, self.password)
         relation.create(targetParentId,id);

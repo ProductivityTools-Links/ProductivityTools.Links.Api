@@ -39,4 +39,4 @@ class Relation():
             "match (n)-[d:CHILD]->(l:Link) where ID(l)=$id  return d"
         )
         result=tx.run(query,id=id)
-        try
+
