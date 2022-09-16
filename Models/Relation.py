@@ -16,6 +16,12 @@ class Relation():
             for row in result:
                 return row
 
+    def remove(self,id):
+        with self.driver.session(database="neo4j") as session:
+            result=session.write_transaction(
+                self._remove_parent_relation,id
+            )
+
     def close(self):
         self.driver.close()
 
@@ -36,7 +42,7 @@ class Relation():
     @staticmethod
     def _remove_parent_relation(tx,id):
         query=(
-            "match (n)-[d:CHILD]->(l:Link) where ID(l)=$id  return d"
+            "match (n)-[d:CHILD]->(l:Link) where ID(l)=$id  delete d"
         )
         result=tx.run(query,id=id)
 

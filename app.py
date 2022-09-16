@@ -22,7 +22,7 @@ def register_resources(app):
     api.add_resource(TreeResource,'/Tree')
     api.add_resource(LinkResource,'/Link')
     api.add_resource(LinkListResource, '/Link/<int:id>')
-    api.add_resource(LinkListResource, '/Relation')
+    api.add_resource(RelationResoure, '/Relation')
 
 
 if __name__=="__main__":
