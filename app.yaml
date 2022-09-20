@@ -1,0 +1,3 @@
+runtime: python310 # or another supported version
+
+entrypoint: python app.py
