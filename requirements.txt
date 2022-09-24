@@ -4,3 +4,4 @@ datetime
 neo4j
 jsonpickle
 flask_cors
+google-cloud-secret-manager
