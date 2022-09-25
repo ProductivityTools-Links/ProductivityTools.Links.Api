@@ -9,4 +9,5 @@ class PasswordResource(Resource):
         client=secretmanager.SecretManagerServiceClient()
         name="projects/488456392633/secrets/neo4jpassword/versions/1"
         r=client.access_secret_version(request={"name":name})
-        return Response(str(r), mimetype="text/plain", direct_passthrough=True);
+        x=str(r.payload.data.decode("UTF-8")).strip()[4:-1]
+        return Response(str(x), mimetype="text/plain", direct_passthrough=True);
