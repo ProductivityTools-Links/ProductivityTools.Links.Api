@@ -18,5 +18,11 @@ class Account():
         )
         result=tx.run(query,name=name)
 
+    @staticmethod
+    def _check_if_account_exists(tx,name):
+        query=(
+            "match (a:account) where a.login='pwujczyk1' return a"
+        )
+
     def close(self):
         self.driver.close()

@@ -11,6 +11,10 @@ from Resources.ApiResource import ApiResource
 
 class TreeResource(ApiResource):
     def get(self):
+        account =Account(self.uri,self.user,self.password)
+        account
+
+
         tree = Tree(self.uri, self.user, self.password)
         result=tree.getTree("pwujczyk1")
         tree.close()

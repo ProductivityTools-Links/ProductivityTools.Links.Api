@@ -12,7 +12,13 @@ class ApiResource(Resource):
         return x
 
     def __init__(self):
-        self.uri= "neo4j+s://8345876f.databases.neo4j.io"
+        devUri="neo4j+s://ae7a9693.databases.neo4j.io";
+        prodUri="neo4j+s://8345876f.databases.neo4j.io";
+
+        self.uri = devUri
+        self.password=os.getenv('password')
+        if self.password is None:
+            self.password= self.getPassword();
+            self.uri=prodUri
+
         self.user = "neo4j"
-        #self.password = os.getenv('password')
-        self.password = self.getPassword(self);
