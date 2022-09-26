@@ -9,6 +9,12 @@ class Account():
             result=session.write_transaction(
                 self._create_account, name
             )
+    def checkIfAccountCreated(self,name):
+        with self.driver.session(database="neo4j") as session:
+            result = session.write_transaction(
+                self._checkIfAccountCreated, name
+            )
+            return result;
 
     @staticmethod
     def _create_account(tx,name):
@@ -16,13 +22,21 @@ class Account():
             "CREATE (a:Account{name:$name})"
             "RETURN a"
         )
-        result=tx.run(query,name=name)
+        tempresult=tx.run(query,name=name)
+        result = tempresult.single()[0]
+
 
     @staticmethod
-    def _check_if_account_exists(tx,name):
-        query=(
-            "match (a:account) where a.login='pwujczyk1' return a"
+    def _checkIfAccountCreated(tx,name):
+        query = (
+            "match (a:account) where a.login=$name return a"
         )
+        result = tx.run(query, name=name)
+        print(result)
+        if result.peek() is None:
+            return False
+        else:
+            return True
 
     def close(self):
         self.driver.close()
