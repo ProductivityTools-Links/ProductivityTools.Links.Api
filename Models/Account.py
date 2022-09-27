@@ -19,7 +19,7 @@ class Account():
     @staticmethod
     def _create_account(tx,name):
         query=(
-            "CREATE (a:Account{name:$name})"
+            "CREATE (a:account{login:$name})"
             "RETURN a"
         )
         tempresult=tx.run(query,name=name)

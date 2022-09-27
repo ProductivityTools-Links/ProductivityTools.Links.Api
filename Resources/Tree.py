@@ -12,9 +12,14 @@ from Resources.ApiResource import ApiResource
 
 class TreeResource(ApiResource):
     def get(self):
+        accountName='pwujczyk1'
+        #move it to login
         account =Account(self.uri,self.user,self.password)
-        accountExists=account.checkIfAccountCreated('pwujczyk1')
+        accountExists=account.checkIfAccountCreated(accountName)
         print(accountExists);
+        if (accountExists==False):
+            account.create(accountName)
+
 
         # tree = Tree(self.uri, self.user, self.password)
         # result=tree.getTree("pwujczyk1")
