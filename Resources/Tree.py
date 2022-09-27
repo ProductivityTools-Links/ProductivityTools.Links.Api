@@ -21,13 +21,13 @@ class TreeResource(ApiResource):
             account.create(accountName)
 
 
-        # tree = Tree(self.uri, self.user, self.password)
-        # result=tree.getTree("pwujczyk1")
-        # tree.close()
-        # jsonresult=jsonpickle.encode(result, unpicklable=False)
-        # return Response(jsonresult, mimetype="text/json", direct_passthrough=True)
-        # return jsonresult
-       #return Response("ok", mimetype="text/plain", direct_passthrough=True);
+        tree = Tree(self.uri, self.user, self.password)
+        result=tree.getTree("pwujczyk1")
+        tree.close()
+        jsonresult=jsonpickle.encode(result, unpicklable=False)
+        return Response(jsonresult, mimetype="text/json", direct_passthrough=True)
+        return jsonresult
+       # return Response("ok", mimetype="text/plain", direct_passthrough=True);
 
     def post(self):
         parentId = request.json['parentId']
