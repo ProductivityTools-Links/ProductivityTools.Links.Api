@@ -7,11 +7,17 @@ from Models.Account import Account
 import json
 import jsonpickle
 from json import JSONEncoder
+from http import HTTPStatus
+
 
 from Resources.ApiResource import ApiResource
 
 class TreeResource(ApiResource):
     def get(self):
+
+        if self.validate_token() == False:
+            return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
+
         accountName='pwujczyk1'
         #move it to login
         account =Account(self.uri,self.user,self.password)

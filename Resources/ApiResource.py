@@ -1,6 +1,9 @@
 from flask_restful import Resource
+from flask import request
 import os
 from google.cloud import secretmanager
+from firebase_admin import auth
+
 
 class ApiResource(Resource):
 
@@ -23,3 +26,13 @@ class ApiResource(Resource):
             self.uri=prodUri
 
         self.user = "neo4j"
+
+    def validate_token(self):
+        if request.headers.environ.__contains__('HTTP_AUTHORIZATION') ==False:
+            return False;
+        id_token = request.headers.environ['HTTP_AUTHORIZATION']
+        id_token = id_token.replace("Bearer", "")
+        id_token = id_token.replace(" ", "")
+        if id_token == 'null':
+            return False
+        decoded_token = auth.verify_id_token(id_token)
