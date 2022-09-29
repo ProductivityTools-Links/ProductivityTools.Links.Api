@@ -36,3 +36,5 @@ class ApiResource(Resource):
         if id_token == 'null':
             return False
         decoded_token = auth.verify_id_token(id_token)
+        print(decoded_token);
+        x=decoded_token
