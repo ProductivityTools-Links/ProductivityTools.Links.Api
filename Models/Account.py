@@ -1,4 +1,5 @@
 from neo4j import GraphDatabase
+from DTO.Account import Account as DTOAccount
 
 class Account():
     def __init__(self,uri,user,password):
@@ -13,6 +14,13 @@ class Account():
         with self.driver.session(database="neo4j") as session:
             result = session.write_transaction(
                 self._checkIfAccountCreated, name
+            )
+            return result;
+
+    def getList(self):
+        with self.driver.session(database="neo4j") as session:
+            result = session.write_transaction(
+                self._get_account_list
             )
             return result;
 
@@ -37,6 +45,18 @@ class Account():
             return False
         else:
             return True
+
+    @staticmethod
+    def _get_account_list(tx):
+        query = (
+            "match (a:account) return a"
+        )
+        accounts = []
+        result = tx.run(query)
+        for element in result:
+            link = DTOAccount(element[0].id, element[0]._properties['login'])
+            accounts.append(link)
+        return accounts;
 
     def close(self):
         self.driver.close()
