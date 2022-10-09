@@ -25,8 +25,11 @@ class AccountListResource(ApiResource):
         if id_token=='null':
             return {'message': 'Missing Http_Authorization header'}, 401
 
-        # xx=auth.verify_id_token()
-        decoded_token = auth.verify_id_token(id_token)
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+        except BaseException as e:
+            return {'message':str(e) }, 401
+
         email=decoded_token['email']
         if (email.endswith('google.com')==False):
             response = {'message': 'Only Googlers'}
