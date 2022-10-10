@@ -25,8 +25,8 @@ def register_resources(app):
     api.add_resource(AccountListResource,'/AccountList')
     api.add_resource(DateResource,'/Date')
     api.add_resource(TreeResource,'/Tree')
-    api.add_resource(LinkResource,'/Link')
-    api.add_resource(LinkListResource, '/Link/<int:id>')
+    api.add_resource(LinkResource,'/Link/<string:login>')
+    # api.add_resource(LinkListResource, '/Link/<int:id>')
     api.add_resource(RelationResoure, '/Relation')
     api.add_resource(PasswordResource,'/Password')
 

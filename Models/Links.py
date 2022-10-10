@@ -15,9 +15,12 @@ class Links():
     def getLinks(self, id):
         with self.driver.session(database="neo4j") as session:
             result = session.read_transaction(self._get_links, id)
-            session.read_transaction(self._get_links_for_account, 'pwujczyk1')
-
             return result;
+
+    def getTreeLinks(self,login):
+        with self.driver.session(database="neo4j") as session:
+            account=session.read_transaction(self._get_links_for_account, login)
+            return account
 
     @staticmethod
     def _get_links_for_account(tx,login):
@@ -26,6 +29,8 @@ class Links():
         for node in account.nodes:
             Links._process_nodes(tx,node)
         print(account)
+        return account
+
 
     @staticmethod
     def _get_account(tx,login):

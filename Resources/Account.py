@@ -6,8 +6,6 @@ from Models.Account import Account
 from Resources.ApiResource import ApiResource
 
 class AccountResource(ApiResource):
-
-
     def get(self):
         # uri = "neo4j+s://8345876f.databases.neo4j.io"
         # user = "neo4j"
