@@ -2,7 +2,9 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 import logging
 
-from DTO.Link import Link
+from DTO.Link import Link as DTOLink
+from DTO.Account import Account as DTOAccount
+from DTO.Node import Node as DTONode
 
 
 
@@ -13,8 +15,59 @@ class Links():
     def getLinks(self, id):
         with self.driver.session(database="neo4j") as session:
             result = session.read_transaction(self._get_links, id)
+            session.read_transaction(self._get_links_for_account, 'pwujczyk1')
+
             return result;
 
+    @staticmethod
+    def _get_links_for_account(tx,login):
+        account=Links._get_account(tx,login)
+        Links._get_account_nodes(tx,account)
+        for node in account.nodes:
+            Links._process_nodes(tx,node)
+        print(account)
+
+    @staticmethod
+    def _get_account(tx,login):
+        query = (
+            'match(a:account{login:$login}) return a'
+        )
+        tempresult = tx.run(query, login=login)
+        result=tempresult.single()[0]
+        account = DTOAccount(result.id, result._properties['login'])
+        return account
+
+    @staticmethod
+    def _get_account_nodes(tx,account):
+        query = (
+            'match(a:account)-[k:CHILD]->(n:Node) where ID(a)=$id return n'
+        )
+        result = tx.run(query, id=account.id)
+        for node in result:
+            newNode=DTONode(node[0].id,account.id,node[0]._properties['name'])
+            account.add_node(newNode)
+            print(node)
+
+
+
+    @staticmethod
+    def _process_nodes(tx, node):
+        query =(
+            'match(n:Node)-[k:CHILD]->(r:Node) where id(n)=$id return r'
+        )
+        nodes=tx.run(query,id=node.id)
+        for childNode in nodes:
+            newNode=DTONode(childNode[0].id,node.id,childNode[0]._properties['name'])
+            node.add_sub_node(newNode)
+            Links._process_nodes(tx,newNode)
+
+        query = (
+            'match(n:Node)-[k:CHILD]->(l:Link) where ID(n)=$id return l'
+        )
+        links = tx.run(query, id=node.id)
+        for link in links:
+            link = DTOLink(link[0].id, node.id, link[0]._properties['name'],link[0]._properties['description'],link[0]._properties['url'])
+            node.add_link(link)
 
     @staticmethod
     def _get_links(tx,id):
@@ -24,7 +77,7 @@ class Links():
         links=[]
         result = tx.run(query,id=id)
         for element in result:
-            link=Link(element[0].id, 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
+            link=DTOLink(element[0].id, 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
             links.append(link)
         return links;
 
