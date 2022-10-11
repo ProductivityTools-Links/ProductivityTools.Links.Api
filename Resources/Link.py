@@ -23,11 +23,3 @@ class LinkResource(ApiResource):
         relation.close();
         return Response(str(createdLinkId), mimetype="text/plain", direct_passthrough=True)
 
-    def get(self,login):
-        link = Links(self.uri, self.user, self.password)
-        result=link.getTreeLinks(login)
-        link.close()
-        jsonresult=jsonpickle.encode(result, unpicklable=False)
-        return Response(jsonresult, mimetype="text/json", direct_passthrough=True)
-
-
