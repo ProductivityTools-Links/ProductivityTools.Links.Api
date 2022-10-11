@@ -13,27 +13,27 @@ from http import HTTPStatus
 from Resources.ApiResource import ApiResource
 
 class TreeResource(ApiResource):
-    def get(self):
-
-        if self.validate_token() == False:
-            return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
-
-        accountName='pwujczyk1'
-        #move it to login
-        account =Account(self.uri,self.user,self.password)
-        accountExists=account.checkIfAccountCreated(accountName)
-        print(accountExists);
-        if (accountExists==False):
-            account.create(accountName)
-
-
-        tree = Tree(self.uri, self.user, self.password)
-        result=tree.getTree("pwujczyk1")
-        tree.close()
-        jsonresult=jsonpickle.encode(result, unpicklable=False)
-        return Response(jsonresult, mimetype="text/json", direct_passthrough=True)
-        return jsonresult
-       # return Response("ok", mimetype="text/plain", direct_passthrough=True);
+    # def get(self):
+    #
+    #     if self.validate_token() == False:
+    #         return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
+    #
+    #     accountName='pwujczyk1'
+    #     #move it to login
+    #     account =Account(self.uri,self.user,self.password)
+    #     accountExists=account.checkIfAccountCreated(accountName)
+    #     print(accountExists);
+    #     if (accountExists==False):
+    #         account.create(accountName)
+    #
+    #
+    #     tree = Tree(self.uri, self.user, self.password)
+    #     result=tree.getTree("pwujczyk1")
+    #     tree.close()
+    #     jsonresult=jsonpickle.encode(result, unpicklable=False)
+    #     return Response(jsonresult, mimetype="text/json", direct_passthrough=True)
+    #     return jsonresult
+    #    # return Response("ok", mimetype="text/plain", direct_passthrough=True);
 
     def post(self):
         parentId = request.json['parentId']

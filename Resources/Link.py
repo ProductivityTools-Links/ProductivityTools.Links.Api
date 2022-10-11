@@ -9,6 +9,10 @@ from Resources.ApiResource import ApiResource
 
 class LinkResource(ApiResource):
     def post(self):
+        message = ApiResource.check_authorization(self)
+        if (message != None):
+            return message, 401
+
         parentId=request.json['parentId']
         name=request.json['name']
         url=request.json['url']

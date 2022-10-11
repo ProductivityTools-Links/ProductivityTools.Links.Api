@@ -38,3 +38,25 @@ class ApiResource(Resource):
         decoded_token = auth.verify_id_token(id_token)
         print(decoded_token);
         x=decoded_token
+
+    def check_authorization(self):
+        if ('HTTP_AUTHORIZATION' in request.headers.environ):
+            id_token = request.headers.environ['HTTP_AUTHORIZATION']
+            id_token = id_token.replace("Bearer", "")
+            id_token = id_token.replace(" ", "")
+        else:
+            response ={'message': 'Missing Http_Authorization header1'}
+            return response
+
+        if id_token == 'null':
+            response= {'message': 'Missing Http_Authorization header2'}
+            return response
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+        except BaseException as e:
+            return {'message': str(e)}
+
+        email = decoded_token['email']
+        if (email.endswith('google.com') == False):
+            response = {'message': 'Only Googlers'}
+            return response
