@@ -26,6 +26,7 @@ class ApiResource(Resource):
             self.uri=prodUri
 
         self.user = "neo4j"
+        self.email='empty'
 
     def validate_token(self):
         if request.headers.environ.__contains__('HTTP_AUTHORIZATION') ==False:
@@ -57,6 +58,8 @@ class ApiResource(Resource):
             return {'message': str(e)}
 
         email = decoded_token['email']
-        if (email.endswith('google.com') == False):
+        self.email=email
+        print("check_autorization")
+        if (email.endswith('google.com') == False and email!='pwujczyk@gmail.com'):
             response = {'message': 'Only Googlers'}
             return response

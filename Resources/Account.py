@@ -7,12 +7,22 @@ from Resources.ApiResource import ApiResource
 
 class AccountResource(ApiResource):
     def get(self):
-        # uri = "neo4j+s://8345876f.databases.neo4j.io"
-        # user = "neo4j"
-        # password = os.getenv('password')
-        # password = "Kp9gl8g7YWx9XDrqAW"
-        app = Account(self.uri, self.user, self.password)
-        # app.create_friendship("Alice1", "David")
-        x = app.create("Alice")
-        app.close()
-        return  Response("OK")
+        message = ApiResource.check_authorization(self)
+        if (message != None):
+            return message, 401
+
+        print("accountresource")
+        accountName=self.email
+        #move it to login
+        account =Account(self.uri,self.user,self.password)
+        accountExists=account.checkIfAccountCreated(accountName)
+        print(accountExists);
+        if (accountExists==False):
+            account.create(accountName)
+            account.close()
+            return Response("Account created")
+
+
+        return  Response("Account already existed")
+
+
