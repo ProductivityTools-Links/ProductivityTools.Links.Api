@@ -13,17 +13,24 @@ class LinkResource(ApiResource):
         if (message != None):
             return message, 401
 
+        id = request.json.get("id")
         parentId=request.json['parentId']
         name=request.json['name']
         url=request.json['url']
         description=request.json['description']
 
         link=Links(self.uri,self.user,self.password)
-        createdLinkId=link.create(name,url,description)
-        link.close()
+        if id is None:
+            createdLinkId=link.create(name,url,description)
+            relation = Relation(self.uri, self.user, self.password)
+            relation.create(parentId, createdLinkId)
+            relation.close();
+            link.close()
+            return Response(str(createdLinkId), mimetype="text/plain", direct_passthrough=True)
 
-        relation=Relation(self.uri,self.user,self.password)
-        relation.create(parentId,createdLinkId)
-        relation.close();
-        return Response(str(createdLinkId), mimetype="text/plain", direct_passthrough=True)
+        else:
+            link.update(id,name,url,description)
+            return Response(str("updated"), mimetype="text/plain", direct_passthrough=True)
+
+
 

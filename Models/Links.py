@@ -114,3 +114,27 @@ class Links():
             logging.error("{query} raised an error: \n {exception}".format(
               query=query, exception=exception))
             raise
+
+    def update(self, id, name,url,description):
+        with self.driver.session(database="neo4j") as session:
+            result=session.write_transaction(
+                self._update_link,id, name, url, description
+            )
+
+            for row in result:
+                return row
+
+    @staticmethod
+    def _update_link(tx, id, name, url, description):
+        query = (
+            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url"
+        )
+        result = tx.run(query,id=id, name=name, url=url, description=description)
+        try:
+            return [row["id"] for row in result]
+            # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+

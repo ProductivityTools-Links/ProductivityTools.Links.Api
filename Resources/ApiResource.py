@@ -20,9 +20,9 @@ class ApiResource(Resource):
 
         self.uri = devUri
         self.password=os.getenv('password')
+        # if True:
         if self.password is None:
-       # if True:
-            self.password= self.getPassword();
+            self.password= self.getPassword()
             self.uri=prodUri
 
         self.user = "neo4j"
