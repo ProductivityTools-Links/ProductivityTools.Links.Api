@@ -6,3 +6,4 @@ jsonpickle
 flask_cors
 google-cloud-secret-manager
 firebase_admin
+Werkzeug==2.2.2
