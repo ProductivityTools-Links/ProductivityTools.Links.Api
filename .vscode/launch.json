@@ -19,6 +19,7 @@
                // "--no-debugger", Comment out this line
                // "--no-reload"  Comment out this line
             ],
+            "envFile": "${workspaceFolder}/.env",
             "jinja": true
         }
     ]
