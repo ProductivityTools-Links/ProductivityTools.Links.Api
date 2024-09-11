@@ -19,7 +19,7 @@
                // "--no-debugger", Comment out this line
                // "--no-reload"  Comment out this line
             ],
-            "envFile": "${workspaceFolder}/.env",
+            "envFile": "d:/GitHub/Home.Configuration/Neo4j.env",
             "jinja": true
         }
     ]

@@ -1,8 +1,14 @@
 from neo4j import GraphDatabase
 from DTO.Account import Account as DTOAccount
+import logging
+import sys
 
 class Account():
     def __init__(self,uri,user,password):
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(logging.DEBUG)
+        logging.getLogger("neo4j").addHandler(handler)
+        logging.getLogger("neo4j").setLevel(logging.DEBUG)
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def create(self,name):

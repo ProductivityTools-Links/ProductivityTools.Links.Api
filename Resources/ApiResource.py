@@ -16,9 +16,9 @@ class ApiResource(Resource):
 
     def __init__(self):
         devUri="neo4j+s://ae7a9693.databases.neo4j.io";
-        prodUri="neo4j+s://8345876f.databases.neo4j.io";
+        prodUri="neo4j+ssc://8345876f.databases.neo4j.io";
 
-        self.uri = devUri
+        self.uri = prodUri
         self.password=os.getenv('password')
         # if True:
         if self.password is None:
