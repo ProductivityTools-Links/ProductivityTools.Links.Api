@@ -5,10 +5,11 @@ import sys
 
 class Account():
     def __init__(self,uri,user,password):
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logging.DEBUG)
-        logging.getLogger("neo4j").addHandler(handler)
-        logging.getLogger("neo4j").setLevel(logging.DEBUG)
+        # driver logging
+        # handler = logging.StreamHandler(sys.stdout)
+        # handler.setLevel(logging.DEBUG)
+        # logging.getLogger("neo4j").addHandler(handler)
+        # logging.getLogger("neo4j").setLevel(logging.DEBUG)
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def create(self,name):
