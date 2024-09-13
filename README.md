@@ -20,3 +20,12 @@ GOOGLE_APPLICATION_CREDENTIALS is used for the firebase authentication
 ### Where it is placed 
 
 Aplication is deployed on the AppEngine in the PTLinksProd project.
+
+### Deployment
+
+I think Cloud build is not working, I can deploy it with the 
+```
+gcloud app deploy --no-cache
+```
+
+I am not providing any env variables but it is working. 
