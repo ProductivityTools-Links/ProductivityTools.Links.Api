@@ -28,4 +28,20 @@ I think Cloud build is not working, I can deploy it with the
 gcloud app deploy --no-cache
 ```
 
-I am not providing any env variables but it is working. 
+I am not providing any env variables but it is working.
+
+
+## queries
+
+```
+match(n:Node)-[k:CHILD*]->(r:Node) where id(n)=1040 return r,n,k
+```
+Match all childs of given parent
+
+
+match (a:account) return a
+
+match(a:account)-[k:CHILD*]->(r:Node) return a,k,r
+
+
+match path=(a:account)-[k:CHILD*]->(r:Node)with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value

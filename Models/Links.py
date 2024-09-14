@@ -1,6 +1,7 @@
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 import logging
+import json
 
 from DTO.Link import Link as DTOLink
 from DTO.Account import Account as DTOAccount
@@ -25,10 +26,22 @@ class Links():
     @staticmethod
     def _get_links_for_account(tx,login):
         account=Links._get_account(tx,login)
+        Links._get_wholeTree(tx,login)
         Links._get_account_nodes(tx,account)
         for node in account.nodes:
             Links._process_nodes(tx,node)
         print(account)
+        return account
+
+    @staticmethod
+    def _get_wholeTree(tx,login):
+        query = (
+            'match(a:account)-[k:CHILD*]->(r:Node) return a,k,r'
+        )
+        tempresult = tx.run(query, login=login)
+        x=json.dumps(tempresult.data())
+        result=tempresult.single()[0]
+        account = DTOAccount(result.id, result._properties['login'])
         return account
 
 
