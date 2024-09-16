@@ -20,13 +20,15 @@ class Links():
 
     def getTreeLinks(self,login):
         with self.driver.session(database="neo4j") as session:
-            account=session.read_transaction(self._get_links_for_account, login)
-            return account
+            tree=session.read_transaction(self._get_json_tree,login);
+            #account=session.read_transaction(self._get_links_for_account, login)
+            return tree
+
 
     @staticmethod
     def _get_links_for_account(tx,login):
         account=Links._get_account(tx,login)
-        Links._get_wholeTree(tx,login)
+        #Links._get_json_tree(tx,login)
         Links._get_account_nodes(tx,account)
         for node in account.nodes:
             Links._process_nodes(tx,node)
@@ -34,15 +36,16 @@ class Links():
         return account
 
     @staticmethod
-    def _get_wholeTree(tx,login):
+    def _get_json_tree(tx,login):
         query = (
-            'match(a:account)-[k:CHILD*]->(r:Node) return a,k,r'
+            'match path=(a:account)-[k:CHILD*]->(r:Node)-[m:CHILD*]->(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value'
         )
         tempresult = tx.run(query, login=login)
-        x=json.dumps(tempresult.data())
-        result=tempresult.single()[0]
-        account = DTOAccount(result.id, result._properties['login'])
-        return account
+        x=tempresult.single()[0]
+        #x=json.dumps(tempresult.data())
+        #result=tempresult.single()[0]
+        #account = DTOAccount(result.id, result._properties['login'])
+        return x
 
 
     @staticmethod
