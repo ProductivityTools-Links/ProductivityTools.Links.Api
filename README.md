@@ -43,5 +43,16 @@ match (a:account) return a
 
 match(a:account)-[k:CHILD*]->(r:Node) return a,k,r
 
+This won't return data if there is no childs (it blocks creating new trees)
+match path=(a:account)-[k:CHILD*]->(r:Node)-[m:CHILD*]-(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
+match path=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r)-[m:CHILD*]->(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
 
-match path=(a:account)-[k:CHILD*]->(r:Node)with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
+
+This will return also empty items, but without links
+match path=(a:account)-[k:CHILD*]->(r:Node) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
+
+
+match (a:account)-[k:CHILD*]->(r:Node)with collect(path) return a,k,r
+
+
+match (n:Node)-[k:CHILD]->(r:Node) where id(n)=14 return n,k,r
