@@ -56,3 +56,12 @@ match (a:account)-[k:CHILD*]->(r:Node)with collect(path) return a,k,r
 
 
 match (n:Node)-[k:CHILD]->(r:Node) where id(n)=14 return n,k,r
+
+This returns everything but I do not know how to convert it to json
+match (a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r:Node)-[y:CHILD*]->(z:Link)  return a,k,r,y,z
+
+
+match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path return path
+
+
+match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value
