@@ -42,7 +42,7 @@ class Relation():
     @staticmethod
     def _remove_parent_relation(tx,id):
         query=(
-            "match (n)-[d:CHILD]->(l:Link) where ID(l)=$id  delete d"
+            "match (n)-[d:CHILD]->(l) where ID(l)=$id  delete d"
         )
         result=tx.run(query,id=id)
 

@@ -65,3 +65,13 @@ match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CH
 
 
 match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value
+
+
+Select node with child nodes
+match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) return n,l,m
+
+Remove relationship
+
+match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) delete l
+
+match (n:Node {name:'2024.S1'})-[l:CHILD]->(m:Node{name:'Evolution'}) delete l
