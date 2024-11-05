@@ -98,17 +98,17 @@ class Links():
         links=[]
         result = tx.run(query,id=id)
         for element in result:
-            link=DTOLink(element[0].id, 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'])
+            link=DTOLink(element[0].id, 0, element[0]._properties['name'],element[0]._properties['description'],element[0]._properties['url'],element[0]._properties['authors'])
             links.append(link)
         return links;
 
     # return [{"id":row["k"][0].id,type:row["k"][0].type, "nodes":row["k"][0].nodes } for row in result]
     # return [{"node":{"id": row["idn"] ,"name":row["n"]["name"]}, "account":{ "id": row["ida"] ,"name":row["a"]["login"]},"relation":{"r":row["k"]}} for row in result]
 
-    def create(self, name,url,description):
+    def create(self, name,url,description, authors):
         with self.driver.session(database="neo4j") as session:
             result=session.write_transaction(
-                self._create_link, name, url, description
+                self._create_link, name, url, description, authors
             )
 
             for row in result:
@@ -118,11 +118,11 @@ class Links():
         self.driver.close()
 
     @staticmethod
-    def _create_link(tx, name,url,description):
+    def _create_link(tx, name,url,description, authors):
         query = (
-        "CREATE (n:Link{name:$name,url:$url,description:$description}) RETURN id(n) as id"
+        "CREATE (n:Link{name:$name,url:$url,description:$description,authors:$authors}) RETURN id(n) as id"
         )
-        result = tx.run(query, name=name,url=url,description=description)
+        result = tx.run(query, name=name,url=url,description=description, authors=authors)
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability
@@ -131,21 +131,21 @@ class Links():
               query=query, exception=exception))
             raise
 
-    def update(self, id, name,url,description):
+    def update(self, id, name,url,description, authors):
         with self.driver.session(database="neo4j") as session:
             result=session.write_transaction(
-                self._update_link,id, name, url, description
+                self._update_link,id, name, url, description, authors
             )
 
             for row in result:
                 return row
 
     @staticmethod
-    def _update_link(tx, id, name, url, description):
+    def _update_link(tx, id, name, url, description,authors):
         query = (
-            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url"
+            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url, l.authors=$authors"
         )
-        result = tx.run(query,id=id, name=name, url=url, description=description)
+        result = tx.run(query,id=id, name=name, url=url, description=description, authors=authors)
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability

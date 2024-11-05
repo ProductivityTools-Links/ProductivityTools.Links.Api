@@ -18,10 +18,11 @@ class LinkResource(ApiResource):
         name=request.json['name']
         url=request.json['url']
         description=request.json['description']
+        authors=request.json['authors']
 
         link=Links(self.uri,self.user,self.password)
         if id is None:
-            createdLinkId=link.create(name,url,description)
+            createdLinkId=link.create(name,url,description,authors)
             relation = Relation(self.uri, self.user, self.password)
             relation.create(parentId, createdLinkId)
             relation.close();
@@ -29,7 +30,7 @@ class LinkResource(ApiResource):
             return Response(str(createdLinkId), mimetype="text/plain", direct_passthrough=True)
 
         else:
-            link.update(id,name,url,description)
+            link.update(id,name,url,description,authors)
             return Response(str("updated"), mimetype="text/plain", direct_passthrough=True)
 
 
