@@ -32,6 +32,11 @@ class LinkResource(ApiResource):
         else:
             link.update(id,name,url,description,authors)
             return Response(str("updated"), mimetype="text/plain", direct_passthrough=True)
+    def delete(self):
+        id=request.json.get("id")
+        link=Links(self.uri,self.user,self.password)
+        result=link.delete(id);
+        return Response(str("deleted $id"), mimetype="text/plain", direct_passthrough=True)
 
 
 

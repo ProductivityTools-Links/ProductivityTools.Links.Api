@@ -113,9 +113,20 @@ class Links():
 
             for row in result:
                 return row
+    def delete(self, id):
+        with self.driver.session(database="neo4j") as session:
+            result=session.write_transaction(
+                self._remove_link,id                
+            )
+            return result
 
     def close(self):
         self.driver.close()
+
+    @staticmethod
+    def _remove_link(tx, id):
+        query=("MATCH (n) where id(n)=$id DETACH DELETE n")
+        result = tx.run(query, id=id);
 
     @staticmethod
     def _create_link(tx, name,url,description, authors):
