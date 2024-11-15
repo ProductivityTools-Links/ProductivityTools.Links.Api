@@ -35,8 +35,8 @@ class LinkResource(ApiResource):
     def delete(self):
         id=request.json.get("id")
         link=Links(self.uri,self.user,self.password)
-        result=link.delete(id);
-        return Response(str("deleted $id"), mimetype="text/plain", direct_passthrough=True)
+        result=link.setAsDeleted(id);
+        return Response(str("Element $id set as deleted"), mimetype="text/plain", direct_passthrough=True)
 
 
 

@@ -114,17 +114,25 @@ class Links():
             for row in result:
                 return row
     def delete(self, id):
+        raise Exception("It should not be called anymore, use setAsDeleted")
         with self.driver.session(database="neo4j") as session:
             result=session.write_transaction(
                 self._remove_link,id                
             )
             return result
+        
+    def setAsDeleted(self, id):
+        with self.driver.session(database="neo4j") as session:
+            result=session.write_transaction(
+                self._set_as_deleted,id
+            )
 
     def close(self):
         self.driver.close()
 
     @staticmethod
     def _remove_link(tx, id):
+        raise Exception("It should not be called anymore, use _set_as_deleted")
         query=("MATCH (n) where id(n)=$id DETACH DELETE n")
         result = tx.run(query, id=id);
 
@@ -164,4 +172,12 @@ class Links():
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
             raise
+        
+    @staticmethod
+    def _set_as_deleted(tx,id):
+        query=(
+            "MATCH (l:Link) where id(l)=$id set l.deleted=1"
+        )
+        result=tx.run(query,id=id)
+        return [row["id"] for row in result]
 
