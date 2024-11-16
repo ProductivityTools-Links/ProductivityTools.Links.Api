@@ -38,7 +38,7 @@ class Links():
     @staticmethod
     def _get_json_tree(tx,login):
         query = (
-            'match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value'
+            'match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) where z.deleted<>1 OR z.deleted IS NULL WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value'
         )
         tempresult = tx.run(query, login=login)
         x=tempresult.single()[0]
