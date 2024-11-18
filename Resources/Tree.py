@@ -36,6 +36,9 @@ class TreeResource(ApiResource):
     #    # return Response("ok", mimetype="text/plain", direct_passthrough=True);
 
     def post(self):
+        if self.validate_token() == False:  
+            return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
+        
         parentId = request.json['parentId']
         nodeName=request.json['name']
         node = Node(self.uri, self.user, self.password)
@@ -44,4 +47,12 @@ class TreeResource(ApiResource):
         relation=Relation(self.uri,self.user,self.password);
         relation.create(parentId,createdNodeId)
         relation.close();
+        
+    def delete(self):
+        if self.validate_token() == False:  
+            return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
+        id=request.json['id']
+        node =Node(self.uri,self.user,self.password)
+        node.delete(id);
+        node.close();
 
