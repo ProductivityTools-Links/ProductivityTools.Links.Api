@@ -75,3 +75,24 @@ Remove relationship
 match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) delete l
 
 match (n:Node {name:'2024.S1'})-[l:CHILD]->(m:Node{name:'Evolution'}) delete l
+
+
+## Ubuntu deployment
+
+[tutorial](https://www.techrepublic.com/article/how-to-install-neo4j-ubuntu-server/)
+
+
+```
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get install wget curl nano software-properties-common dirmngr apt-transport-https gnupg gnupg2 ca-certificates lsb-release ubuntu-keyring unzip -y
+curl -fsSL https://debian.neo4j.com/neotechnology.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/neo4j.gpg
+echo "deb [signed-by=/usr/share/keyrings/neo4j.gpg] https://debian.neo4j.com stable latest" | sudo tee -a /etc/apt/sources.list.d/neo4j.list
+
+sudo apt-get update
+
+sudo apt-get install neo4j -y
+
+
+
+
+```
