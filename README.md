@@ -1,5 +1,16 @@
 # ProductivityTools.Links.Api
 
+## Installation
+
+```
+pip install -r requirements.txt
+python -m flask run
+or
+$env:PORT=5005; python app.py
+```
+
+## Variables
+
 In .vscode directory there is a file launch.json that defines debug properties.
 
 In this file we see path for the environment variables "d:/GitHub/Home.Configuration/Neo4j.env"
@@ -91,8 +102,5 @@ echo "deb [signed-by=/usr/share/keyrings/neo4j.gpg] https://debian.neo4j.com sta
 sudo apt-get update
 
 sudo apt-get install neo4j -y
-
-
-
 
 ```
