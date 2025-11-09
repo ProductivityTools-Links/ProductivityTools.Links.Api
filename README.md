@@ -88,7 +88,10 @@ match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) delete l
 match (n:Node {name:'2024.S1'})-[l:CHILD]->(m:Node{name:'Evolution'}) delete l
 
 
-## Ubuntu deployment
+## neo4j database installation on the Ubuntu
+
+As neo4j was stopping the database I started a proces of moving db to Ubuntu.
+I am not sure if neo4j was stopping only the legacy version of db. If new version won't be stopped then I will not move to ubuntu.
 
 [tutorial](https://www.techrepublic.com/article/how-to-install-neo4j-ubuntu-server/)
 
