@@ -9,7 +9,7 @@ class Relation():
 
     def create(self,parentId, childId):
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._create_relation, parentId, childId
             )
 
@@ -18,7 +18,7 @@ class Relation():
 
     def remove(self,id):
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._remove_parent_relation,id
             )
 

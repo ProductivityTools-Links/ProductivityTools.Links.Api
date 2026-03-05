@@ -14,19 +14,19 @@ class Account():
 
     def create(self,name):
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._create_account, name
             )
     def checkIfAccountCreated(self,name):
         with self.driver.session(database="neo4j") as session:
-            result = session.write_transaction(
+            result = session.execute_write(
                 self._checkIfAccountCreated, name
             )
             return result;
 
     def getList(self):
         with self.driver.session(database="neo4j") as session:
-            result = session.write_transaction(
+            result = session.execute_write(
                 self._get_account_list
             )
             return result;

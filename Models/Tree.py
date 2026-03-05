@@ -7,7 +7,7 @@ class Tree():
         self.driver=GraphDatabase.driver(uri,auth=(user,password))
     # def getTree(self, login):
     #     with self.driver.session(database="neo4j") as session:
-    #         result=session.read_transaction(self._get_tree, login)
+    #         result=session.execute_read(self._get_tree, login)
     #         return result;
     #
     # @staticmethod

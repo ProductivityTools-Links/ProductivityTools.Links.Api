@@ -15,13 +15,13 @@ class Links():
 
     def getLinks(self, id):
         with self.driver.session(database="neo4j") as session:
-            result = session.read_transaction(self._get_links, id)
+            result = session.execute_read(self._get_links, id)
             return result;
 
     def getTreeLinks(self,login):
         with self.driver.session(database="neo4j") as session:
-            tree=session.read_transaction(self._get_json_tree,login);
-            #account=session.read_transaction(self._get_links_for_account, login)
+            tree=session.execute_read(self._get_json_tree,login);
+            #account=session.execute_read(self._get_links_for_account, login)
             return tree
 
 
@@ -107,7 +107,7 @@ class Links():
 
     def create(self, name,url,description, authors):
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._create_link, name, url, description, authors
             )
 
@@ -116,14 +116,14 @@ class Links():
     def delete(self, id):
         raise Exception("It should not be called anymore, use setAsDeleted")
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._remove_link,id                
             )
             return result
         
     def setAsDeleted(self, id):
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._set_as_deleted,id
             )
 
@@ -152,7 +152,7 @@ class Links():
 
     def update(self, id, name,url,description, authors):
         with self.driver.session(database="neo4j") as session:
-            result=session.write_transaction(
+            result=session.execute_write(
                 self._update_link,id, name, url, description, authors
             )
 
