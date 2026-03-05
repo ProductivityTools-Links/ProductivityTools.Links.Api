@@ -7,24 +7,24 @@ from firebase_admin import auth
 
 class ApiResource(Resource):
 
-    def getPassword(self):
-        client = secretmanager.SecretManagerServiceClient()
-        name = "projects/488456392633/secrets/neo4jpassword/versions/1"
-        r = client.access_secret_version(request={"name": name})
-        x = str(r.payload.data.decode("UTF-8")).strip()[4:-1]
-        return x
+    # def getPassword(self):
+    #     client = secretmanager.SecretManagerServiceClient()
+    #     name = "projects/488456392633/secrets/neo4jpassword/versions/1"
+    #     r = client.access_secret_version(request={"name": name})
+    #     x = str(r.payload.data.decode("UTF-8")).strip()[4:-1]
+    #     return x
 
     def __init__(self):
         devUri="neo4j+s://ae7a9693.databases.neo4j.io";
         # prodUri="neo4j+ssc://8345876f.databases.neo4j.io";
-        prodUri="neo4j+ssc://192.168.0.41"
+        prodUri="neo4j://192.168.0.41"
 
         self.uri = prodUri
-        self.password=os.getenv('password')
+        self.password=os.getenv('NEO4J_PASSWORD')
         # if True:
-        if self.password is None:
-            self.password= self.getPassword()
-            self.uri=prodUri
+        # if self.password is None:
+        #     self.password= self.getPassword()
+        #     self.uri=prodUri
 
         self.user = "neo4j"
         self.email='empty'
