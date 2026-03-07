@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 # User and Group should be updated to the user running the application
-User=paul
-Group=paul
+User=pawel
+Group=pawel
 WorkingDirectory=/opt/PT.Links.Api
 Environment="PATH=/opt/PT.Links.Api/venv/bin"
 Environment="PORT=5005"

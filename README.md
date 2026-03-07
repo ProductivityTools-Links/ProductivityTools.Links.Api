@@ -123,3 +123,10 @@ Aplikacja jest hostowana przez serwer **Gunicorn** na porcie `5005`. Aby sprawdz
   ```bash
   sudo systemctl restart links-api
   ```
+
+
+## Firweall
+
+```
+sudo ufw allow 5005/tcp
+```
