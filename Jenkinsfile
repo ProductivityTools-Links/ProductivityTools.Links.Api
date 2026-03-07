@@ -33,7 +33,7 @@ pipeline {
          stage('clone') {
             steps {
                 // Get code from the GitHub repository
-                git branch: 'master',
+                git branch: 'main',
                 url: 'https://github.com/ProductivityTools-Links/ProductivityTools.Links.Api.git'
             }
         }
