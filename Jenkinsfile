@@ -38,6 +38,19 @@ pipeline {
             }
         }
 
+         stage('register service') {
+            steps {
+                script {
+                    echo "Registering systemd service"
+                    sh '''
+                        sudo cp links-api.service /etc/systemd/system/links-api.service
+                        sudo systemctl daemon-reload
+                        sudo systemctl enable links-api
+                    '''
+                }
+            }
+        }
+
         stage('stop application') {
             steps {
                 script {

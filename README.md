@@ -87,3 +87,39 @@ match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) delete l
 
 match (n:Node {name:'2024.S1'})-[l:CHILD]->(m:Node{name:'Evolution'}) delete l
 
+
+# Deployment (CI/CD)
+
+Proces wdrożenia jest zautomatyzowany za pomocą **Jenkins**. Każdy push na gałąź `main` uruchamia potok zdefiniowany w `Jenkinsfile`.
+
+### Konfiguracja serwera (Jednorazowa)
+
+Aby Jenkins mógł zarządzać usługą systemową bez interakcji, należy nadać mu odpowiednie uprawnienia `sudo` na serwerze docelowym.
+
+1. Uruchom edytor `visudo`:
+   ```bash
+   sudo visudo
+   ```
+
+2. Dodaj na końcu pliku poniższą linię (pozwala ona Jenkinsowi na restartowanie aplikacji oraz aktualizację definicji usługi):
+   ```text
+   jenkins ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop links-api, /usr/bin/systemctl start links-api, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl enable links-api, /usr/bin/cp * /etc/systemd/system/links-api.service
+   ```
+
+### Debugowanie i Status
+Aplikacja jest hostowana przez serwer **Gunicorn** na porcie `5005`. Aby sprawdzić status usługi lub przejrzeć logi bezpośrednio na serwerze, użyj komend:
+
+* **Status usługi:**
+  ```bash
+  systemctl status links-api
+  ```
+
+* **Logi w czasie rzeczywistym:**
+  ```bash
+  journalctl -u links-api -f
+  ```
+
+* **Ręczny restart:**
+  ```bash
+  sudo systemctl restart links-api
+  ```

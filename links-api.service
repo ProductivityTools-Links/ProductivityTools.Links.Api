@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve ProductivityTools.Links.Api
+After=network.target
+
+[Service]
+# User and Group should be updated to the user running the application
+User=paul
+Group=paul
+WorkingDirectory=/opt/PT.Links.Api
+Environment="PATH=/opt/PT.Links.Api/venv/bin"
+Environment="PORT=5005"
+ExecStart=/opt/PT.Links.Api/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5005 "app:create_app()"
+
+[Install]
+WantedBy=multi-user.target
