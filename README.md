@@ -36,15 +36,6 @@ Application is deployed on an Ubuntu server and managed via systemd. The service
 
 The service loads environment variables from `/home/pawel/github/Home.Configuration/PT.Links.env` using the `EnvironmentFile` directive.
 
-### Deployment
-
-I think Cloud build is not working, I can deploy it with the 
-```
-gcloud app deploy --no-cache
-```
-
-I am not providing any env variables but it is working.
-
 
 ## queries
 

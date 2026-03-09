@@ -15,22 +15,23 @@ from firebase_admin import initialize_app
 
 def create_app():
     app=Flask(__name__)
-    CORS(app)
+    # Explicitly allow Authorization header and common methods
+    CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Authorization", "Content-Type"]}})
     register_resources(app)
     default_app = initialize_app()
     return app
 
 def register_resources(app):
     api=Api(app)
-    api.add_resource(AccountResource,'/Account')
-    api.add_resource(AccountListResource,'/AccountList')
-    api.add_resource(DateResource,'/Date')
-    api.add_resource(TreeResource,'/Tree')
-    api.add_resource(LinkResource,'/Link')
-    api.add_resource(LinkListResource, '/Link/<int:id>')
-    api.add_resource(TreeLinkListResource, '/TreeLinks/<string:login>')
-    api.add_resource(RelationResoure, '/Relation')
-    api.add_resource(PasswordResource,'/Password')
+    api.add_resource(AccountResource,'/account')
+    api.add_resource(AccountListResource,'/accountlist')
+    api.add_resource(DateResource,'/date')
+    api.add_resource(TreeResource,'/tree')
+    api.add_resource(LinkResource,'/link')
+    api.add_resource(LinkListResource, '/link/<int:id>')
+    api.add_resource(TreeLinkListResource, '/treelinks/<string:login>')
+    api.add_resource(RelationResoure, '/relation')
+    api.add_resource(PasswordResource,'/password')
 
 
 if __name__=="__main__":
