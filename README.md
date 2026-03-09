@@ -1,6 +1,6 @@
 # ProductivityTools.Links.Api
 
-## Installation
+## Development
 
 ```
 pip install -r requirements.txt
@@ -9,7 +9,7 @@ or
 $env:PORT=5005; python app.py
 ```
 
-## Variables
+### Variables
 
 In .vscode directory there is a file launch.json that defines debug properties.
 
@@ -22,15 +22,19 @@ NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD=
 AURA_INSTANCENAME=
 
-GOOGLE_APPLICATION_CREDENTIALS="d:\GitHub\Home.Configuration\ProductivityTools.Links.ServiceAccountKey.json"
+GOOGLE_APPLICATION_CREDENTIALS="d:\GitHub\Home.Configuration\ProductivityTools.ProjectsWeb.Firebase.ServiceAccount.json"
 GOOGLE_CLOUD_PROJECT=
 ```
 
+> **Note on Paths**: The `PT.Links.env` file contains Windows paths for local development. In production (Ubuntu), the path for `GOOGLE_APPLICATION_CREDENTIALS` is overridden in the `links-api.service` file to point to the correct Linux location.
+
 GOOGLE_APPLICATION_CREDENTIALS is used for the firebase authentication 
 
-### Where it is placed 
+## Production
 
-Aplication is deployed on the AppEngine in the PTLinksProd project.
+Application is deployed on an Ubuntu server and managed via systemd. The service configuration is defined in [links-api.service](links-api.service).
+
+The service loads environment variables from `/home/pawel/github/Home.Configuration/PT.Links.env` using the `EnvironmentFile` directive.
 
 ### Deployment
 

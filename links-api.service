@@ -8,6 +8,8 @@ User=pawel
 Group=pawel
 WorkingDirectory=/opt/PT.Links.Api
 Environment="PATH=/opt/PT.Links.Api/venv/bin"
+EnvironmentFile=/home/pawel/github/Home.Configuration/PT.Links.env
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/home/pawel/github/Home.Configuration/ProductivityTools.ProjectsWeb.Firebase.ServiceAccount.json"
 Environment="PORT=5005"
 ExecStart=/opt/PT.Links.Api/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5005 "app:create_app()"
 
