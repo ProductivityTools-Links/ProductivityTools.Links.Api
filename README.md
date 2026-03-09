@@ -13,7 +13,7 @@ $env:PORT=5005; python app.py
 
 In .vscode directory there is a file launch.json that defines debug properties.
 
-In this file we see path for the environment variables "d:/GitHub/Home.Configuration/Neo4j.env"
+In this file we see path for the environment variables "d:/GitHub/Home.Configuration/PT.Links.env"
 
 In the configuration we have
 ```

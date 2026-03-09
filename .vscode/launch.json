@@ -12,14 +12,14 @@
             "env": {
                 "FLASK_APP": "app.py",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"  // make sure it is not "0"
+                "FLASK_DEBUG": "1" // make sure it is not "0"
             },
             "args": [
                 "run",
-               // "--no-debugger", Comment out this line
-               // "--no-reload"  Comment out this line
+                // "--no-debugger", Comment out this line
+                // "--no-reload"  Comment out this line
             ],
-            "envFile": "d:/GitHub/Home.Configuration/Neo4j.env",
+            "envFile": "d:/GitHub/Home.Configuration/PT.Links.env",
             "jinja": true
         }
     ]
