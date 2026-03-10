@@ -24,7 +24,7 @@ def create_app():
 def register_resources(app):
     api=Api(app)
     api.add_resource(AccountResource,'/account')
-    api.add_resource(AccountListResource,'/accountlist')
+    api.add_resource(AccountListResource,'/accountlist','AccountList')
     api.add_resource(DateResource,'/date')
     api.add_resource(TreeResource,'/tree')
     api.add_resource(LinkResource,'/link')
