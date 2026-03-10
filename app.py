@@ -23,15 +23,15 @@ def create_app():
 
 def register_resources(app):
     api=Api(app)
-    api.add_resource(AccountResource,'/account')
-    api.add_resource(AccountListResource,'/accountlist','AccountList')
-    api.add_resource(DateResource,'/date')
-    api.add_resource(TreeResource,'/tree')
-    api.add_resource(LinkResource,'/link')
-    api.add_resource(LinkListResource, '/link/<int:id>')
-    api.add_resource(TreeLinkListResource, '/treelinks/<string:login>')
-    api.add_resource(RelationResoure, '/relation')
-    api.add_resource(PasswordResource,'/password')
+    api.add_resource(AccountResource,'/account', '/Account')
+    api.add_resource(AccountListResource,'/accountlist', '/AccountList')
+    api.add_resource(DateResource,'/date', '/Date')
+    api.add_resource(TreeResource,'/tree', '/Tree')
+    api.add_resource(LinkResource,'/link', '/Link')
+    api.add_resource(LinkListResource, '/link/<int:id>', '/Link/<int:id>')
+    api.add_resource(TreeLinkListResource, '/treelinks/<string:login>', '/TreeLinks/<string:login>')
+    api.add_resource(RelationResoure, '/relation', '/Relation')
+    api.add_resource(PasswordResource,'/password', '/Password')
 
 
 if __name__=="__main__":
