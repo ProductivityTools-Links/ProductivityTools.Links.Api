@@ -37,24 +37,26 @@ Application is deployed on an Ubuntu server and managed via systemd. The service
 The service loads environment variables from `/home/pawel/github/Home.Configuration/PT.Links.env` using the `EnvironmentFile` directive.
 
 
-## queries
+## Queries
 
 ```
 match(n:Node)-[k:CHILD*]->(r:Node) where id(n)=1040 return r,n,k
 ```
 Match all childs of given parent
 
-
+```
 match (a:account) return a
 
 match(a:account)-[k:CHILD*]->(r:Node) return a,k,r
-
+```
 This won't return data if there is no childs (it blocks creating new trees)
+```
 match path=(a:account)-[k:CHILD*]->(r:Node)-[m:CHILD*]-(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
 match path=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r)-[m:CHILD*]->(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
-
+```
 
 This will return also empty items, but without links
+```
 match path=(a:account)-[k:CHILD*]->(r:Node) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
 
 
@@ -62,8 +64,10 @@ match (a:account)-[k:CHILD*]->(r:Node)with collect(path) return a,k,r
 
 
 match (n:Node)-[k:CHILD]->(r:Node) where id(n)=14 return n,k,r
+```
 
 This returns everything but I do not know how to convert it to json
+```
 match (a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r:Node)-[y:CHILD*]->(z:Link)  return a,k,r,y,z
 
 
@@ -71,57 +75,63 @@ match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CH
 
 
 match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value
-
+```
 
 Select node with child nodes
+```
 match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) return n,l,m
-
+```
 Remove relationship
-
+```
 match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) delete l
 
 match (n:Node {name:'2024.S1'})-[l:CHILD]->(m:Node{name:'Evolution'}) delete l
-
+```
 
 # Deployment (CI/CD)
 
-Proces wdrożenia jest zautomatyzowany za pomocą **Jenkins**. Każdy push na gałąź `main` uruchamia potok zdefiniowany w `Jenkinsfile`.
+The deployment process is automated using **Jenkins**. Every push to the `main` branch triggers the pipeline defined in `Jenkinsfile`.
 
-### Konfiguracja serwera (Jednorazowa)
+### Server Configuration (One-time)
 
-Aby Jenkins mógł zarządzać usługą systemową bez interakcji, należy nadać mu odpowiednie uprawnienia `sudo` na serwerze docelowym.
+To allow Jenkins to manage the system service without interaction, you need to grant it appropriate `sudo` permissions on the target server.
 
-1. Uruchom edytor `visudo`:
+1. Run the `visudo` editor:
    ```bash
    sudo visudo
    ```
 
-2. Dodaj na końcu pliku poniższą linię (pozwala ona Jenkinsowi na restartowanie aplikacji oraz aktualizację definicji usługi):
+2. Add the following line at the end of the file (this allows Jenkins to restart the application and update the service definition):
    ```text
    jenkins ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop links-api, /usr/bin/systemctl start links-api, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl enable links-api, /usr/bin/cp * /etc/systemd/system/links-api.service
    ```
 
-### Debugowanie i Status
-Aplikacja jest hostowana przez serwer **Gunicorn** na porcie `5005`. Aby sprawdzić status usługi lub przejrzeć logi bezpośrednio na serwerze, użyj komend:
+### Debugging and Status
+The application is hosted by the **Gunicorn** server on port `5005`. To check the service status or view logs directly on the server, use the commands:
 
-* **Status usługi:**
+* **Service Status:**
   ```bash
   systemctl status links-api
   ```
 
-* **Logi w czasie rzeczywistym:**
+* **Real-time logs:**
   ```bash
   journalctl -u links-api -f
   ```
 
-* **Ręczny restart:**
+* **Manual restart:**
   ```bash
   sudo systemctl restart links-api
   ```
 
 
-## Firweall
+### Firewall
 
 ```
 sudo ufw allow 5005/tcp
 ```
+
+### Errors that I faced
+- [CORS error] Redirect domain to the server
+- [CORS error] In the reverse proxy check if the redirection to ubuntu server is correct 
+- [A project ID is required to access the auth service.\n 1. Use a service account credential, or\n 2. set the project ID explicitly via Firebase App options, or\n 3. set the project ID via the GOOGLE_CLOUD_PROJECT environment variable] Lanuch.json is not used when running application with ```python -m flask run``` you need to debug it in vscode 
