@@ -26,7 +26,6 @@ AURA_INSTANCENAME=
 ```
 We also need to provide two google env variables directly in the file:
 ```
-
 GOOGLE_APPLICATION_CREDENTIALS="d:\GitHub\Home.Configuration\ProductivityTools.ProjectsWeb.Firebase.ServiceAccount.json"
 GOOGLE_CLOUD_PROJECT=
 ```
