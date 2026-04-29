@@ -1,7 +1,9 @@
 # ProductivityTools.Links.Api
 
 ## Development
+After installing the python and python debugger extension F5 to run application.
 
+old trash:
 But when application is used this way the environemt variables that are in the launch.json are not taken into account, so more env variables is needed to be provided to run application
 ```
 pip install -r requirements.txt
