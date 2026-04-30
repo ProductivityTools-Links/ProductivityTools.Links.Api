@@ -18,10 +18,6 @@ class ApiResource(Resource):
         devUri="neo4j+s://ae7a9693.databases.neo4j.io";
         # prodUri="neo4j+ssc://8345876f.databases.neo4j.io";
         prodUri="neo4j://192.168.0.41"
-        # Prioritize URI and Password from environment variables.
-        # This ensures that variables from PT.Links.env (via launch.json or systemd) are used.
-        self.uri = os.getenv('NEO4J_URI', "neo4j://192.168.0.41")
-        self.password = os.getenv('NEO4J_PASSWORD')
 
         self.uri = prodUri
         self.password=os.getenv('NEO4J_PASSWORD')
@@ -29,9 +25,6 @@ class ApiResource(Resource):
         # if self.password is None:
         #     self.password= self.getPassword()
         #     self.uri=prodUri
-        if not self.password:
-            # This helps identify if the environment variable was actually loaded
-            print("CRITICAL: NEO4J_PASSWORD environment variable is missing.")
 
         self.user = "neo4j"
         self.email='empty'
