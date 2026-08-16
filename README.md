@@ -1,66 +1,45 @@
 # ProductivityTools.Links.Api
 
 ## Development
-After installing the python and python debugger extension F5 to run application.
 
-old trash:
-But when application is used this way the environemt variables that are in the launch.json are not taken into account, so more env variables is needed to be provided to run application
-```
-pip install -r requirements.txt
-python -m flask run
-or
-$env:PORT=5005; python app.py
-```
+After installing Python and the Python Debugger extension in VS Code, press **F5** to run and debug the application.
 
 ### Variables
 
-In .vscode directory there is a file launch.json that defines debug properties.
+In `.vscode/launch.json`, the configuration points to the environment file: `d:/GitHub/Home.Configuration/PT.Links.env`.
 
-In this file we see path for the environment variables "d:/GitHub/Home.Configuration/PT.Links.env"
-
-In the configuration we have
-```
+The environment file defines:
+```ini
 NEO4J_URI=
 NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD=
 AURA_INSTANCENAME=
+```
 
-```
-We also need to provide two google env variables directly in the file:
-```
+Google Cloud / Firebase environment variables:
+```ini
 GOOGLE_APPLICATION_CREDENTIALS="d:\GitHub\Home.Configuration\ProductivityTools.ProjectsWeb.Firebase.ServiceAccount.json"
 GOOGLE_CLOUD_PROJECT=
 ```
-> **Note on Paths**: The `PT.Links.env` file contains Windows paths for local development. In production (Ubuntu), the path for `GOOGLE_APPLICATION_CREDENTIALS` is overridden in the `links-api.service` file to point to the correct Linux location.
 
-GOOGLE_APPLICATION_CREDENTIALS is used for the firebase authentication 
+> **Note on Paths**: The `PT.Links.env` file contains Windows paths for local development. In production (Ubuntu), the path for `GOOGLE_APPLICATION_CREDENTIALS` is set in the `links-api.service` file to point to the Linux location.
+
+---
 
 ## Production
 
-Application is deployed on an Ubuntu server and managed via systemd. The service configuration is defined in [links-api.service](links-api.service).
+The application is deployed on an Ubuntu server and managed via systemd. The service configuration is defined in [links-api.service](links-api.service).
 
 The service loads environment variables from `/home/pawel/github/Home.Configuration/PT.Links.env` using the `EnvironmentFile` directive.
 
+---
+
 # Deployment (CI/CD)
 
-The deployment process is automated using **Jenkins**. Every push to the `main` branch triggers the pipeline defined in `Jenkinsfile`.
-
-### Server Configuration (One-time)
-
-To allow Jenkins to manage the system service without interaction, you need to grant it appropriate `sudo` permissions on the target server.
-
-1. Run the `visudo` editor:
-   ```bash
-   sudo visudo
-   ```
-
-2. Add the following line at the end of the file (this allows Jenkins to restart the application and update the service definition):
-   ```text
-   jenkins ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop links-api, /usr/bin/systemctl start links-api, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl enable links-api, /usr/bin/cp * /etc/systemd/system/links-api.service
-   ```
+The deployment process is automated using **GitHub Actions**. Every push to the `main` branch (or manual workflow dispatch) triggers the deployment workflow defined in [.github/workflows/deploy.yml](.github/workflows/deploy.yml).
 
 ### Debugging and Status
-The application is hosted by the **Gunicorn** server on port `5005`. To check the service status or view logs directly on the server, use the commands:
+The application is hosted by the **Gunicorn** server on port `5005`. To check the service status or view logs directly on the server, use:
 
 * **Service Status:**
   ```bash
@@ -77,66 +56,58 @@ The application is hosted by the **Gunicorn** server on port `5005`. To check th
   sudo systemctl restart links-api
   ```
 
-
 ### Firewall
-
-```
+```bash
 sudo ufw allow 5005/tcp
 ```
 
-### Errors that I faced
-- [CORS error] Redirect domain to the server
-- [CORS error] In the reverse proxy check if the redirection to ubuntu server is correct 
-- [A project ID is required to access the auth service.\n 1. Use a service account credential, or\n 2. set the project ID explicitly via Firebase App options, or\n 3. set the project ID via the GOOGLE_CLOUD_PROJECT environment variable] Lanuch.json is not used when running application with ```python -m flask run``` you need to debug it in vscode 
+---
 
-## Queries
+## Troubleshooting & Common Issues
 
-```
+- **CORS error**: Verify that the domain redirect to the server and reverse proxy routing to the Ubuntu server are properly configured.
+- **Firebase Auth error** (*"A project ID is required to access the auth service"*): Ensure `GOOGLE_CLOUD_PROJECT` and `GOOGLE_APPLICATION_CREDENTIALS` are set or debug using the VS Code launch configuration.
+
+---
+
+## Neo4j Cypher Queries
+
+### Match all children of a given parent
+```cypher
 match(n:Node)-[k:CHILD*]->(r:Node) where id(n)=1040 return r,n,k
 ```
-Match all childs of given parent
 
-```
+### Match account and children
+```cypher
 match (a:account) return a
 
 match(a:account)-[k:CHILD*]->(r:Node) return a,k,r
 ```
-This won't return data if there is no childs (it blocks creating new trees)
-```
+
+### Convert tree with links (APOC)
+```cypher
 match path=(a:account)-[k:CHILD*]->(r:Node)-[m:CHILD*]-(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
+
 match path=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r)-[m:CHILD*]->(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
 ```
 
-This will return also empty items, but without links
-```
+### Return empty items without links
+```cypher
 match path=(a:account)-[k:CHILD*]->(r:Node) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
 
-
-match (a:account)-[k:CHILD*]->(r:Node)with collect(path) return a,k,r
-
+match (a:account)-[k:CHILD*]->(r:Node) with collect(path) return a,k,r
 
 match (n:Node)-[k:CHILD]->(r:Node) where id(n)=14 return n,k,r
 ```
 
-This returns everything but I do not know how to convert it to json
-```
-match (a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r:Node)-[y:CHILD*]->(z:Link)  return a,k,r,y,z
-
-
-match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path return path
-
-
-match path1=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value
-```
-
-Select node with child nodes
-```
+### Select node with child nodes
+```cypher
 match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) return n,l,m
 ```
-Remove relationship
-```
+
+### Remove relationships
+```cypher
 match (n:Node {name:'Evolution'})-[l:CHILD]->(m:Node) delete l
 
 match (n:Node {name:'2024.S1'})-[l:CHILD]->(m:Node{name:'Evolution'}) delete l
 ```
-
