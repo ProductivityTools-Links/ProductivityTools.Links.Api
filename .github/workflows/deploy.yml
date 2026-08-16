@@ -1,0 +1,68 @@
+name: Deploy ProductivityTools.Links.Api
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: self-hosted
+
+    steps:
+      - name: Hello
+        run: echo "Hello from ProductivityTools.Links.Api Pipeline!"
+
+      - name: Identify User
+        run: |
+          echo "Checking runner user..."
+          echo "Username (whoami):"
+          whoami
+          echo "User details (id):"
+          id
+          echo "Finished user identification."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Register systemd service
+        run: |
+          echo "Registering systemd service"
+          sudo cp links-api.service /etc/systemd/system/links-api.service
+          sudo systemctl daemon-reload
+          sudo systemctl enable links-api
+
+      - name: Stop application
+        run: |
+          echo "Stopping application"
+          sudo systemctl stop links-api || true
+
+      - name: Deploy and Build in /opt/PT.Links.Api
+        run: |
+          echo "Deploying files and installing dependencies to /opt/PT.Links.Api"
+          umask 002
+
+          # Ensure the target directory exists
+          mkdir -p /opt/PT.Links.Api
+
+          # Copy project files to the target directory
+          # Using rsync helps exclude unnecessary files like .git or __pycache__
+          rsync -avq --exclude='.git/' --exclude='venv/' --exclude='__pycache__/' ./ /opt/PT.Links.Api/
+
+          # Switch to the target directory
+          cd /opt/PT.Links.Api
+
+          # Create a virtual environment if it doesn't already exist
+          python3 -m venv venv
+
+          # Install required packages
+          ./venv/bin/pip install -r requirements.txt
+
+      - name: Start application
+        run: |
+          echo "Starting application"
+          sudo systemctl start links-api
