@@ -46,8 +46,9 @@ jobs:
           echo "Deploying files and installing dependencies to /opt/PT.Links.Api"
           umask 002
 
-          # Ensure the target directory exists
-          mkdir -p /opt/PT.Links.Api
+          # Ensure the target directory exists and is owned by runner user
+          sudo mkdir -p /opt/PT.Links.Api
+          sudo chown -R $(whoami):$(id -gn) /opt/PT.Links.Api
 
           # Copy project files to the target directory
           # Using rsync helps exclude unnecessary files like .git or __pycache__
