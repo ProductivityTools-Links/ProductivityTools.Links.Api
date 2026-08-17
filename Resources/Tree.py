@@ -39,20 +39,29 @@ class TreeResource(ApiResource):
         if self.validate_token() == False:  
             return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
         
-        parentId = request.json['parentId']
-        nodeName=request.json['name']
+        id = request.json.get('id')
+        nodeName = request.json['name']
         node = Node(self.uri, self.user, self.password)
-        createdNodeId=node.create(nodeName);
-        node.close();
-        relation=Relation(self.uri,self.user,self.password);
-        relation.create(parentId,createdNodeId)
-        relation.close();
-        
+
+        if id is not None:
+            node.update(id, nodeName)
+            node.close()
+            return Response(str(id), mimetype="text/plain", direct_passthrough=True)
+        else:
+            parentId = request.json['parentId']
+            createdNodeId = node.create(nodeName)
+            node.close()
+            relation = Relation(self.uri, self.user, self.password)
+            relation.create(parentId, createdNodeId)
+            relation.close()
+            return Response(str(createdNodeId), mimetype="text/plain", direct_passthrough=True)
+
     def delete(self):
         if self.validate_token() == False:  
             return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
-        id=request.json['id']
-        node =Node(self.uri,self.user,self.password)
-        node.delete(id);
-        node.close();
+        id = request.json['id']
+        node = Node(self.uri, self.user, self.password)
+        node.delete(id)
+        node.close()
+        return Response(str("Element $id set as deleted"), mimetype="text/plain", direct_passthrough=True)
 

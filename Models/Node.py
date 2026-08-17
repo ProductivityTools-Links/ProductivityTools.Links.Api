@@ -16,10 +16,18 @@ class Node():
             for row in result:
                 return row
 
+    def update(self, id, name):
+        with self.driver.session(database="neo4j") as session:
+            result = session.execute_write(
+                self._update_node, int(id), name
+            )
+            for row in result:
+                return row
+
     def delete(self, id):
         with self.driver.session(database="neo4j") as session:
             result=session.execute_write(
-                self._mark_node_as_deleted, id
+                self._mark_node_as_deleted, int(id)
             )
 
     def close(self):
@@ -34,6 +42,19 @@ class Node():
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
+
+    @staticmethod
+    def _update_node(tx, id, name):
+        query = (
+            "MATCH (n:Node) WHERE id(n)=$id SET n.name=$name RETURN id(n) as id"
+        )
+        result = tx.run(query, id=id, name=name)
+        try:
+            return [row["id"] for row in result]
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
