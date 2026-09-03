@@ -15,19 +15,14 @@ class ApiResource(Resource):
     #     return x
 
     def __init__(self):
-        devUri="neo4j+s://ae7a9693.databases.neo4j.io";
-        # prodUri="neo4j+ssc://8345876f.databases.neo4j.io";
-        prodUri="neo4j://192.168.0.41"
+        self.uri = os.getenv('NEO4J_URI', "neo4j://192.168.0.41")
+        self.user = os.getenv('NEO4J_USERNAME', "neo4j")
+        self.password = os.getenv('NEO4J_PASSWORD')
 
-        self.uri = prodUri
-        self.password=os.getenv('NEO4J_PASSWORD')
-        # if True:
-        # if self.password is None:
-        #     self.password= self.getPassword()
-        #     self.uri=prodUri
+        if not self.password:
+            print("ERROR: NEO4J_PASSWORD environment variable is not set!")
 
-        self.user = "neo4j"
-        self.email='empty'
+        self.email = 'empty'
 
     def validate_token(self):
         if request.headers.environ.__contains__('HTTP_AUTHORIZATION') ==False:
