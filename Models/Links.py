@@ -36,15 +36,25 @@ class Links():
         return account
 
     @staticmethod
-    def _get_json_tree(tx,login):
+    def _get_json_tree(tx, login):
         query = (
-            'match path1=(a:account)-[k:CHILD*]->(r:Node) WHERE r.deleted<>1 OR r.deleted IS NULL OPTIONAL MATCH path2=(r:Node)-[y:CHILD*]->(z:Link) where z.deleted<>1 OR z.deleted IS NULL WITH apoc.path.combine(path1, path2) AS path with collect (path) as paths  call apoc.convert.toTree(paths) YIELD value return value'
+            "MATCH path = (a:account {login: $login})-[:CHILD*]->(target) "
+            "WHERE ALL(n IN nodes(path) WHERE coalesce(n.deleted, 0) <> 1) "
+            "WITH collect(path) AS paths "
+            "CALL apoc.convert.toTree(paths) YIELD value "
+            "RETURN value"
         )
         tempresult = tx.run(query, login=login)
-        x=tempresult.single()[0]
-        #x=json.dumps(tempresult.data())
-        #result=tempresult.single()[0]
-        #account = DTOAccount(result.id, result._properties['login'])
+        record = tempresult.single()
+        if not record:
+            account_record = tx.run("MATCH (a:account {login: $login}) RETURN a", login=login).single()
+            if account_record:
+                acc = account_record[0]
+                return {"_id": acc.id, "_type": "account", "login": acc["login"], "child": []}
+            return {}
+        x = record[0]
+        if isinstance(x, dict) and "child" not in x:
+            x["child"] = []
         return x
 
 

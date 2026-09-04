@@ -86,18 +86,11 @@ match(a:account)-[k:CHILD*]->(r:Node) return a,k,r
 
 ### Convert tree with links (APOC)
 ```cypher
-match path=(a:account)-[k:CHILD*]->(r:Node)-[m:CHILD*]-(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
-
-match path=(a:account)-[k:CHILD*]->(r:Node) OPTIONAL MATCH (r)-[m:CHILD*]->(l:Link) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
-```
-
-### Return empty items without links
-```cypher
-match path=(a:account)-[k:CHILD*]->(r:Node) with collect(path) as paths call apoc.convert.toTree(paths) YIELD value return value
-
-match (a:account)-[k:CHILD*]->(r:Node) with collect(path) return a,k,r
-
-match (n:Node)-[k:CHILD]->(r:Node) where id(n)=14 return n,k,r
+MATCH path = (a:account {login: $login})-[:CHILD*]->(target)
+WHERE ALL(n IN nodes(path) WHERE coalesce(n.deleted, 0) <> 1)
+WITH collect(path) AS paths
+CALL apoc.convert.toTree(paths) YIELD value
+RETURN value
 ```
 
 ### Select node with child nodes
