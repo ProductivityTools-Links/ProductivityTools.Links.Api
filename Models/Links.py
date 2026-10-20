@@ -64,6 +64,15 @@ class Links():
             return inferred
         return "Undefined"
 
+    @staticmethod
+    def _normalize_clicks(clicks):
+        if clicks is None:
+            return 0
+        try:
+            return max(0, int(clicks))
+        except (ValueError, TypeError):
+            return 0
+
     def getLinks(self, id, include_archived=False):
         with self.driver.session(database="neo4j") as session:
             result = session.execute_read(self._get_links, int(id), bool(include_archived))
@@ -96,6 +105,7 @@ class Links():
         elif node.get("_type") == "Link":
             node["authors"] = Links._normalize_authors(node.get("authors"))
             node["type"] = Links._normalize_type(node.get("type"), node.get("url"))
+            node["clicks"] = Links._normalize_clicks(node.get("clicks"))
         children = node.get("child")
         if isinstance(children, list):
             for child in children:
@@ -185,7 +195,8 @@ class Links():
                 props.get('description'),
                 props.get('url'),
                 Links._normalize_authors(props.get('authors')),
-                Links._normalize_type(props.get('type'), props.get('url'))
+                Links._normalize_type(props.get('type'), props.get('url')),
+                Links._normalize_clicks(props.get('clicks'))
             )
             node.add_link(link)
 
@@ -214,7 +225,8 @@ class Links():
                 props.get('description'),
                 props.get('url'),
                 Links._normalize_authors(props.get('authors')),
-                Links._normalize_type(props.get('type'), props.get('url'))
+                Links._normalize_type(props.get('type'), props.get('url')),
+                Links._normalize_clicks(props.get('clicks'))
             )
             links.append(link)
         return links;
@@ -260,7 +272,7 @@ class Links():
         normalized_authors = Links._normalize_authors(authors)
         normalized_type = Links._normalize_type(link_type, url)
         query = (
-        "CREATE (n:Link{name:$name,url:$url,description:$description,authors:$authors,type:$type}) RETURN id(n) as id"
+        "CREATE (n:Link{name:$name,url:$url,description:$description,authors:$authors,type:$type,clicks:0}) RETURN id(n) as id"
         )
         result = tx.run(query, name=name,url=url,description=description, authors=normalized_authors, type=normalized_type)
         try:
@@ -287,7 +299,7 @@ class Links():
         normalized_authors = Links._normalize_authors(authors)
         normalized_type = Links._normalize_type(link_type, url)
         query = (
-            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url, l.authors=$authors, l.type=$type"
+            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url, l.authors=$authors, l.type=$type, l.clicks=coalesce(l.clicks, 0)"
         )
         result = tx.run(query,id=id, name=name, url=url, description=description, authors=normalized_authors, type=normalized_type)
         try:
@@ -297,6 +309,21 @@ class Links():
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception))
             raise
+
+    def incrementClicks(self, id):
+        with self.driver.session(database="neo4j") as session:
+            return session.execute_write(self._increment_clicks, int(id))
+
+    @staticmethod
+    def _increment_clicks(tx, id):
+        query = (
+            "MATCH (l:Link) WHERE id(l)=$id "
+            "SET l.clicks = coalesce(l.clicks, 0) + 1 "
+            "RETURN l.clicks AS clicks"
+        )
+        result = tx.run(query, id=int(id))
+        record = result.single()
+        return int(record["clicks"]) if record and record["clicks"] is not None else 0
         
     @staticmethod
     def _set_as_deleted(tx,id):

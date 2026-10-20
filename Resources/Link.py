@@ -40,4 +40,23 @@ class LinkResource(ApiResource):
         return Response(str("Element $id set as deleted"), mimetype="text/plain", direct_passthrough=True)
 
 
+class LinkClickResource(ApiResource):
+    def post(self):
+        message = ApiResource.check_authorization(self)
+        if message is not None:
+            return message, 401
+
+        id = request.json.get("id")
+        if id is None:
+            return "Missing link id", 400
+
+        link = Links(self.uri, self.user, self.password)
+        try:
+            clicks = link.incrementClicks(int(id))
+            return Response(str(clicks), mimetype="text/plain", direct_passthrough=True)
+        finally:
+            link.close()
+
+
+
 
