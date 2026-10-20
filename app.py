@@ -1,5 +1,5 @@
 from Resources.Date import DateResource
-from Resources.Tree import TreeResource
+from Resources.Tree import TreeResource, TreeArchiveResource, TreeUnarchiveResource
 from Resources.Account import AccountResource
 from Resources.LinkList import LinkListResource
 from Resources.Link import LinkResource
@@ -27,6 +27,8 @@ def register_resources(app):
     api.add_resource(AccountListResource,'/accountlist', '/AccountList')
     api.add_resource(DateResource,'/date', '/Date')
     api.add_resource(TreeResource,'/tree', '/Tree')
+    api.add_resource(TreeArchiveResource, '/tree/archive', '/Tree/Archive', '/Tree/archive')
+    api.add_resource(TreeUnarchiveResource, '/tree/unarchive', '/Tree/Unarchive', '/Tree/unarchive')
     api.add_resource(LinkResource,'/link', '/Link')
     api.add_resource(LinkListResource, '/link/<int:id>', '/Link/<int:id>')
     api.add_resource(TreeLinkListResource, '/treelinks/<string:login>', '/TreeLinks/<string:login>')

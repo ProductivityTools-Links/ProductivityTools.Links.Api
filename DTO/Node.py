@@ -1,8 +1,9 @@
 class Node:
-    def __init__(self,id,parent_id,name):
+    def __init__(self,id,parent_id,name,archived=False):
         self.id=id
         self.parent_id=parent_id
         self.name=name
+        self.archived=bool(archived)
         self.nodes=[]
         self.links=[]
 

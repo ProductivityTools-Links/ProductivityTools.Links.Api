@@ -40,7 +40,7 @@ class TreeResource(ApiResource):
             return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
         
         id = request.json.get('id')
-        nodeName = request.json['name']
+        nodeName = request.json.get('name')
         node = Node(self.uri, self.user, self.password)
 
         if id is not None:
@@ -64,4 +64,32 @@ class TreeResource(ApiResource):
         node.delete(id)
         node.close()
         return Response(str("Element $id set as deleted"), mimetype="text/plain", direct_passthrough=True)
+
+
+class TreeArchiveResource(ApiResource):
+    def post(self):
+        if self.validate_token() == False:
+            return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
+
+        data = request.get_json(silent=True) or {}
+        id = data.get('id')
+
+        node = Node(self.uri, self.user, self.password)
+        node.archive(id)
+        node.close()
+        return Response(str(id), mimetype="text/plain", direct_passthrough=True)
+
+
+class TreeUnarchiveResource(ApiResource):
+    def post(self):
+        if self.validate_token() == False:
+            return {'message': 'access token is incorrect'}, HTTPStatus.UNAUTHORIZED
+
+        data = request.get_json(silent=True) or {}
+        id = data.get('id')
+
+        node = Node(self.uri, self.user, self.password)
+        node.unarchive(id)
+        node.close()
+        return Response(str(id), mimetype="text/plain", direct_passthrough=True)
 

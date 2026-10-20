@@ -30,13 +30,27 @@ class Node():
                 self._mark_node_as_deleted, int(id)
             )
 
+    def archive(self, id):
+        return self._set_archived(id, True)
+
+    def unarchive(self, id):
+        return self._set_archived(id, False)
+
+    def _set_archived(self, id, archived):
+        with self.driver.session(database="neo4j") as session:
+            result = session.execute_write(
+                self._set_node_archived, int(id), bool(archived)
+            )
+            for row in result:
+                return row
+
     def close(self):
         self.driver.close()
 
     @staticmethod
     def _create_node(tx,name):
         query=(
-            "CREATE (n:Node{name:$name}) RETURN id(n) as id"
+            "CREATE (n:Node{name:$name, archived:false}) RETURN id(n) as id"
         )
         result=tx.run(query,name=name)
         try:
@@ -67,3 +81,16 @@ class Node():
         )
         result=tx.run(query,id=id);
         return [row["id"] for row in result]
+
+    @staticmethod
+    def _set_node_archived(tx, id, archived):
+        query = (
+            "MATCH (n:Node) WHERE id(n)=$id SET n.archived=$archived RETURN id(n) as id"
+        )
+        result = tx.run(query, id=id, archived=bool(archived))
+        try:
+            return [row["id"] for row in result]
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception))
+            raise
