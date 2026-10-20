@@ -31,6 +31,39 @@ class Links():
                     normalized.append(cleaned)
         return normalized
 
+    @staticmethod
+    def _infer_type_from_url(url):
+        if not url or not isinstance(url, str):
+            return None
+        lower = url.lower()
+        if "docs.google.com/document" in lower:
+            return "Document"
+        if "docs.google.com/presentation" in lower:
+            return "Slides"
+        if "docs.google.com/spreadsheets" in lower:
+            return "Sheets"
+        if "docs.google.com/drawings" in lower:
+            return "Drawing"
+        return None
+
+    @staticmethod
+    def _normalize_type(link_type, url=None):
+        if link_type:
+            cleaned = str(link_type).strip().lower()
+            type_map = {
+                "document": "Document",
+                "slides": "Slides",
+                "sheets": "Sheets",
+                "drawing": "Drawing",
+                "page": "Page",
+            }
+            if cleaned in type_map:
+                return type_map[cleaned]
+        inferred = Links._infer_type_from_url(url)
+        if inferred:
+            return inferred
+        return "Undefined"
+
     def getLinks(self, id, include_archived=False):
         with self.driver.session(database="neo4j") as session:
             result = session.execute_read(self._get_links, int(id), bool(include_archived))
@@ -62,6 +95,7 @@ class Links():
             node["archived"] = bool(raw_archived) if raw_archived not in ("false", "False", "0", 0, None) else False
         elif node.get("_type") == "Link":
             node["authors"] = Links._normalize_authors(node.get("authors"))
+            node["type"] = Links._normalize_type(node.get("type"), node.get("url"))
         children = node.get("child")
         if isinstance(children, list):
             for child in children:
@@ -144,7 +178,15 @@ class Links():
         links = tx.run(query, id=node.id)
         for link in links:
             props = link[0]._properties
-            link = DTOLink(link[0].id, node.id, props.get('name'),props.get('description'),props.get('url'),Links._normalize_authors(props.get('authors')))
+            link = DTOLink(
+                link[0].id,
+                node.id,
+                props.get('name'),
+                props.get('description'),
+                props.get('url'),
+                Links._normalize_authors(props.get('authors')),
+                Links._normalize_type(props.get('type'), props.get('url'))
+            )
             node.add_link(link)
 
     @staticmethod
@@ -165,18 +207,27 @@ class Links():
         result = tx.run(query,id=id)
         for element in result:
             props = element[0]._properties
-            link=DTOLink(element[0].id, 0, props.get('name'),props.get('description'),props.get('url'),Links._normalize_authors(props.get('authors')))
+            link=DTOLink(
+                element[0].id,
+                0,
+                props.get('name'),
+                props.get('description'),
+                props.get('url'),
+                Links._normalize_authors(props.get('authors')),
+                Links._normalize_type(props.get('type'), props.get('url'))
+            )
             links.append(link)
         return links;
 
     # return [{"id":row["k"][0].id,type:row["k"][0].type, "nodes":row["k"][0].nodes } for row in result]
     # return [{"node":{"id": row["idn"] ,"name":row["n"]["name"]}, "account":{ "id": row["ida"] ,"name":row["a"]["login"]},"relation":{"r":row["k"]}} for row in result]
 
-    def create(self, name,url,description, authors):
+    def create(self, name,url,description, authors, link_type="Undefined"):
         normalized_authors = self._normalize_authors(authors)
+        normalized_type = self._normalize_type(link_type, url)
         with self.driver.session(database="neo4j") as session:
             result=session.execute_write(
-                self._create_link, name, url, description, normalized_authors
+                self._create_link, name, url, description, normalized_authors, normalized_type
             )
 
             for row in result:
@@ -205,12 +256,13 @@ class Links():
         result = tx.run(query, id=id);
 
     @staticmethod
-    def _create_link(tx, name,url,description, authors):
+    def _create_link(tx, name,url,description, authors, link_type="Undefined"):
         normalized_authors = Links._normalize_authors(authors)
+        normalized_type = Links._normalize_type(link_type, url)
         query = (
-        "CREATE (n:Link{name:$name,url:$url,description:$description,authors:$authors}) RETURN id(n) as id"
+        "CREATE (n:Link{name:$name,url:$url,description:$description,authors:$authors,type:$type}) RETURN id(n) as id"
         )
-        result = tx.run(query, name=name,url=url,description=description, authors=normalized_authors)
+        result = tx.run(query, name=name,url=url,description=description, authors=normalized_authors, type=normalized_type)
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability
@@ -219,23 +271,25 @@ class Links():
               query=query, exception=exception))
             raise
 
-    def update(self, id, name,url,description, authors):
+    def update(self, id, name,url,description, authors, link_type="Undefined"):
         normalized_authors = self._normalize_authors(authors)
+        normalized_type = self._normalize_type(link_type, url)
         with self.driver.session(database="neo4j") as session:
             result=session.execute_write(
-                self._update_link,id, name, url, description, normalized_authors
+                self._update_link,id, name, url, description, normalized_authors, normalized_type
             )
 
             for row in result:
                 return row
 
     @staticmethod
-    def _update_link(tx, id, name, url, description,authors):
+    def _update_link(tx, id, name, url, description,authors, link_type="Undefined"):
         normalized_authors = Links._normalize_authors(authors)
+        normalized_type = Links._normalize_type(link_type, url)
         query = (
-            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url, l.authors=$authors"
+            "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url, l.authors=$authors, l.type=$type"
         )
-        result = tx.run(query,id=id, name=name, url=url, description=description, authors=normalized_authors)
+        result = tx.run(query,id=id, name=name, url=url, description=description, authors=normalized_authors, type=normalized_type)
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability
