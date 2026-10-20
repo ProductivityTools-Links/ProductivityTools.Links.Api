@@ -2,6 +2,7 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 import logging
 import json
+import re
 
 from DTO.Link import Link as DTOLink
 from DTO.Account import Account as DTOAccount
@@ -12,6 +13,23 @@ from DTO.Node import Node as DTONode
 class Links():
     def __init__(self,uri,user,password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
+
+    @staticmethod
+    def _normalize_authors(authors):
+        if not authors:
+            return []
+        raw_items = authors if isinstance(authors, (list, tuple)) else [authors]
+        normalized = []
+        seen = set()
+        for item in raw_items:
+            if item is None:
+                continue
+            for part in re.split(r'[,;\n]+', str(item)):
+                cleaned = part.strip()
+                if cleaned and cleaned not in seen:
+                    seen.add(cleaned)
+                    normalized.append(cleaned)
+        return normalized
 
     def getLinks(self, id, include_archived=False):
         with self.driver.session(database="neo4j") as session:
@@ -42,6 +60,8 @@ class Links():
         if node.get("_type") == "Node":
             raw_archived = node.get("archived", False)
             node["archived"] = bool(raw_archived) if raw_archived not in ("false", "False", "0", 0, None) else False
+        elif node.get("_type") == "Link":
+            node["authors"] = Links._normalize_authors(node.get("authors"))
         children = node.get("child")
         if isinstance(children, list):
             for child in children:
@@ -124,7 +144,7 @@ class Links():
         links = tx.run(query, id=node.id)
         for link in links:
             props = link[0]._properties
-            link = DTOLink(link[0].id, node.id, props.get('name'),props.get('description'),props.get('url'),props.get('authors'))
+            link = DTOLink(link[0].id, node.id, props.get('name'),props.get('description'),props.get('url'),Links._normalize_authors(props.get('authors')))
             node.add_link(link)
 
     @staticmethod
@@ -145,7 +165,7 @@ class Links():
         result = tx.run(query,id=id)
         for element in result:
             props = element[0]._properties
-            link=DTOLink(element[0].id, 0, props.get('name'),props.get('description'),props.get('url'),props.get('authors'))
+            link=DTOLink(element[0].id, 0, props.get('name'),props.get('description'),props.get('url'),Links._normalize_authors(props.get('authors')))
             links.append(link)
         return links;
 
@@ -153,9 +173,10 @@ class Links():
     # return [{"node":{"id": row["idn"] ,"name":row["n"]["name"]}, "account":{ "id": row["ida"] ,"name":row["a"]["login"]},"relation":{"r":row["k"]}} for row in result]
 
     def create(self, name,url,description, authors):
+        normalized_authors = self._normalize_authors(authors)
         with self.driver.session(database="neo4j") as session:
             result=session.execute_write(
-                self._create_link, name, url, description, authors
+                self._create_link, name, url, description, normalized_authors
             )
 
             for row in result:
@@ -185,10 +206,11 @@ class Links():
 
     @staticmethod
     def _create_link(tx, name,url,description, authors):
+        normalized_authors = Links._normalize_authors(authors)
         query = (
         "CREATE (n:Link{name:$name,url:$url,description:$description,authors:$authors}) RETURN id(n) as id"
         )
-        result = tx.run(query, name=name,url=url,description=description, authors=authors)
+        result = tx.run(query, name=name,url=url,description=description, authors=normalized_authors)
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability
@@ -198,9 +220,10 @@ class Links():
             raise
 
     def update(self, id, name,url,description, authors):
+        normalized_authors = self._normalize_authors(authors)
         with self.driver.session(database="neo4j") as session:
             result=session.execute_write(
-                self._update_link,id, name, url, description, authors
+                self._update_link,id, name, url, description, normalized_authors
             )
 
             for row in result:
@@ -208,10 +231,11 @@ class Links():
 
     @staticmethod
     def _update_link(tx, id, name, url, description,authors):
+        normalized_authors = Links._normalize_authors(authors)
         query = (
             "MATCH (l:Link) WHERE id(l)=$id SET l.name=$name, l.description=$description, l.url=$url, l.authors=$authors"
         )
-        result = tx.run(query,id=id, name=name, url=url, description=description, authors=authors)
+        result = tx.run(query,id=id, name=name, url=url, description=description, authors=normalized_authors)
         try:
             return [row["id"] for row in result]
             # Capture any errors along with the query and data for traceability

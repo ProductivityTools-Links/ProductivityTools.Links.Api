@@ -18,7 +18,7 @@ class LinkResource(ApiResource):
         name=request.json['name']
         url=request.json['url']
         description=request.json['description']
-        authors=request.json['authors']
+        authors=request.json.get('authors', [])
 
         link=Links(self.uri,self.user,self.password)
         if id is None:
